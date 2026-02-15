@@ -1106,7 +1106,7 @@
   let refreshInterval = null;
 
   // ---- API helpers ----
-  const BASE = window.location.origin;
+  const BASE = window.location.pathname.replace(/\/$/, '');
 
   async function api(path, opts) {
     try {
