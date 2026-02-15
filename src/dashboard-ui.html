@@ -37,9 +37,7 @@
     --mono: 'IBM Plex Mono', 'Consolas', monospace;
     --sans: 'DM Sans', -apple-system, sans-serif;
     --radius: 4px;
-    --sidebar-w: 280px;
-    --inspector-w: 380px;
-    --bottombar-h: 180px;
+    --inspector-w: 400px;
   }
 
   html, body {
@@ -47,58 +45,35 @@
     background: var(--bg-0);
     color: var(--text-0);
     font-family: var(--sans);
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.5;
-    overflow: hidden;
+    overflow-x: hidden;
   }
 
-  /* --- Scanline overlay --- */
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 9999;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.03) 2px,
-      rgba(0, 0, 0, 0.03) 4px
-    );
-  }
-
-  /* --- Layout --- */
+  /* --- Layout: single column, mobile-first --- */
   .app {
-    display: grid;
-    grid-template-columns: var(--sidebar-w) 1fr 0;
-    grid-template-rows: 1fr var(--bottombar-h);
-    height: 100vh;
-    transition: grid-template-columns 0.3s ease;
-  }
-  .app.inspector-open {
-    grid-template-columns: var(--sidebar-w) 1fr var(--inspector-w);
-  }
-
-  /* --- Sidebar --- */
-  .sidebar {
-    grid-row: 1 / 3;
-    background: var(--bg-1);
-    border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    min-height: 100vh;
   }
 
-  .sidebar-header {
-    padding: 20px 16px 16px;
+  /* --- Top bar (logo + queue selector) --- */
+  .sidebar {
+    background: var(--bg-1);
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
   }
 
+  .sidebar-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
   .logo {
     font-family: var(--mono);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--accent);
     letter-spacing: 2px;
@@ -106,6 +81,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-shrink: 0;
   }
 
   .logo::before {
@@ -129,38 +105,48 @@
     font-size: 10px;
     color: var(--text-2);
     letter-spacing: 1px;
-    margin-top: 4px;
+    margin-left: auto;
+    flex-shrink: 0;
   }
 
+  /* Queue list: horizontal scrollable row of badges/tabs */
   .queue-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px;
+    display: flex;
+    gap: 8px;
+    padding: 0 16px 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
   }
 
-  .queue-list::-webkit-scrollbar { width: 4px; }
+  .queue-list::-webkit-scrollbar { height: 4px; }
   .queue-list::-webkit-scrollbar-track { background: transparent; }
   .queue-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
   .queue-card {
-    padding: 12px;
-    margin-bottom: 4px;
-    border: 1px solid transparent;
+    flex-shrink: 0;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     cursor: pointer;
     transition: all 0.15s ease;
     position: relative;
+    min-width: 0;
+    max-width: 260px;
+    background: var(--bg-2);
   }
 
   .queue-card:hover {
-    background: var(--bg-2);
-    border-color: var(--border);
+    background: var(--bg-3);
+    border-color: var(--border-bright);
   }
 
   .queue-card.active {
     background: var(--bg-3);
     border-color: var(--accent);
-    box-shadow: inset 3px 0 0 var(--accent), 0 0 12px var(--accent-glow);
+    box-shadow: 0 0 10px var(--accent-glow), inset 0 -2px 0 var(--accent);
   }
 
   .queue-card-name {
@@ -168,7 +154,7 @@
     font-size: 12px;
     font-weight: 600;
     color: var(--text-0);
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -176,20 +162,21 @@
 
   .queue-badges {
     display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
+    gap: 4px;
+    flex-wrap: nowrap;
   }
 
   .badge {
     font-family: var(--mono);
     font-size: 10px;
     font-weight: 500;
-    padding: 2px 6px;
+    padding: 1px 5px;
     border-radius: 2px;
     display: inline-flex;
     align-items: center;
-    gap: 3px;
+    gap: 2px;
     line-height: 1;
+    white-space: nowrap;
   }
 
   .badge-waiting { background: rgba(107, 114, 128, 0.15); color: var(--gray); }
@@ -206,14 +193,9 @@
     50% { box-shadow: 0 0 8px var(--red-glow), 0 0 16px rgba(255, 77, 106, 0.08); }
   }
 
+  /* Hide trend bars in horizontal mode - not enough space */
   .queue-trend {
-    position: absolute;
-    right: 12px;
-    top: 12px;
-    display: flex;
-    align-items: flex-end;
-    gap: 1px;
-    height: 16px;
+    display: none;
   }
 
   .trend-bar {
@@ -228,18 +210,22 @@
   .main {
     display: flex;
     flex-direction: column;
+    flex: 1;
     overflow: hidden;
     background: var(--bg-0);
+    min-height: 0;
   }
 
   .main-header {
-    padding: 16px 20px;
+    padding: 12px 16px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
     background: var(--bg-1);
+    gap: 12px;
+    flex-wrap: wrap;
   }
 
   .main-title {
@@ -250,6 +236,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    min-width: 0;
   }
 
   .main-title .queue-state {
@@ -259,6 +246,7 @@
     border-radius: 2px;
     text-transform: uppercase;
     letter-spacing: 1px;
+    flex-shrink: 0;
   }
 
   .state-running { background: var(--accent-glow); color: var(--accent); }
@@ -267,13 +255,14 @@
   .main-actions {
     display: flex;
     gap: 8px;
+    flex-shrink: 0;
   }
 
   .btn {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
-    padding: 6px 12px;
+    padding: 6px 14px;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--bg-2);
@@ -309,26 +298,30 @@
 
   /* --- Filter tabs --- */
   .filter-bar {
-    padding: 0 20px;
+    padding: 0 16px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     gap: 0;
     flex-shrink: 0;
     background: var(--bg-1);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .filter-tab {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
-    padding: 10px 14px;
+    padding: 10px 12px;
     color: var(--text-2);
     cursor: pointer;
     border-bottom: 2px solid transparent;
     transition: all 0.15s ease;
     position: relative;
     user-select: none;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .filter-tab:hover {
@@ -341,22 +334,24 @@
   }
 
   .filter-tab .tab-count {
-    font-size: 9px;
+    font-size: 10px;
     margin-left: 4px;
     opacity: 0.6;
   }
 
   .search-box {
     margin-left: auto;
-    padding: 5px 10px;
+    padding: 6px 10px;
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 12px;
     background: var(--bg-2);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     color: var(--text-0);
     outline: none;
-    width: 180px;
+    width: 160px;
+    min-width: 100px;
+    flex-shrink: 1;
     transition: border-color 0.15s ease;
   }
 
@@ -371,16 +366,18 @@
   /* --- Job table --- */
   .job-table-wrap {
     flex: 1;
-    overflow-y: auto;
+    overflow: auto;
     padding: 0;
+    min-height: 0;
   }
 
-  .job-table-wrap::-webkit-scrollbar { width: 6px; }
+  .job-table-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
   .job-table-wrap::-webkit-scrollbar-track { background: var(--bg-0); }
   .job-table-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
   .job-table {
     width: 100%;
+    min-width: 500px;
     border-collapse: collapse;
   }
 
@@ -392,12 +389,12 @@
 
   .job-table th {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--text-2);
-    padding: 10px 16px;
+    padding: 10px 14px;
     text-align: left;
     background: var(--bg-1);
     border-bottom: 1px solid var(--border);
@@ -405,9 +402,9 @@
   }
 
   .job-table td {
-    padding: 10px 16px;
+    padding: 10px 14px;
     border-bottom: 1px solid rgba(42, 48, 64, 0.5);
-    font-size: 12px;
+    font-size: 13px;
     vertical-align: middle;
   }
 
@@ -427,13 +424,13 @@
 
   .job-id {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-1);
   }
 
   .job-name {
     font-family: var(--mono);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--text-0);
   }
@@ -446,6 +443,7 @@
     border-radius: 2px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    white-space: nowrap;
   }
 
   .state-waiting { background: rgba(107, 114, 128, 0.15); color: var(--gray); }
@@ -456,8 +454,9 @@
 
   .job-time {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-2);
+    white-space: nowrap;
   }
 
   .job-actions-cell {
@@ -467,14 +466,15 @@
 
   .btn-sm {
     font-family: var(--mono);
-    font-size: 10px;
-    padding: 3px 8px;
+    font-size: 11px;
+    padding: 4px 10px;
     border: 1px solid var(--border);
     border-radius: 2px;
     background: transparent;
     color: var(--text-2);
     cursor: pointer;
     transition: all 0.1s ease;
+    white-space: nowrap;
   }
 
   .btn-sm:hover {
@@ -489,9 +489,11 @@
     align-items: center;
     justify-content: center;
     height: 100%;
+    min-height: 200px;
     color: var(--text-2);
     font-family: var(--mono);
     gap: 8px;
+    padding: 32px 16px;
   }
 
   .empty-state-icon {
@@ -501,27 +503,51 @@
   }
 
   .empty-state-text {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .empty-state-sub {
-    font-size: 11px;
+    font-size: 12px;
     opacity: 0.6;
   }
 
-  /* --- Inspector --- */
+  /* --- Inspector: fixed slide-over panel from the right --- */
   .inspector {
-    grid-row: 1 / 3;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(var(--inspector-w), 90vw);
     background: var(--bg-1);
     border-left: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    transition: opacity 0.2s ease;
+    z-index: 200;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
+  }
+
+  .app.inspector-open .inspector {
+    transform: translateX(0);
+  }
+
+  /* Backdrop overlay when inspector is open */
+  .inspector-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 199;
+  }
+
+  .app.inspector-open .inspector-backdrop {
+    display: block;
   }
 
   .inspector-header {
-    padding: 16px;
+    padding: 14px 16px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -531,7 +557,7 @@
 
   .inspector-title {
     font-family: var(--mono);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text-0);
     display: flex;
@@ -540,22 +566,23 @@
   }
 
   .inspector-close {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
-    background: transparent;
-    color: var(--text-2);
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+    color: var(--text-1);
     cursor: pointer;
-    border-radius: 2px;
-    font-size: 14px;
+    border-radius: var(--radius);
+    font-size: 18px;
     transition: all 0.1s ease;
   }
 
   .inspector-close:hover {
     background: var(--bg-3);
+    border-color: var(--border-bright);
     color: var(--text-0);
   }
 
@@ -567,9 +594,9 @@
 
   .inspector-tab {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 500;
-    padding: 8px 14px;
+    padding: 10px 16px;
     color: var(--text-2);
     cursor: pointer;
     border-bottom: 2px solid transparent;
@@ -600,7 +627,7 @@
 
   .inspector-section-title {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -613,13 +640,13 @@
   .inspector-kv {
     display: grid;
     grid-template-columns: 100px 1fr;
-    gap: 4px 12px;
-    font-size: 12px;
+    gap: 6px 12px;
+    font-size: 13px;
   }
 
   .inspector-kv dt {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-2);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -628,14 +655,14 @@
 
   .inspector-kv dd {
     font-family: var(--mono);
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-0);
     word-break: break-all;
   }
 
   .json-viewer {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.6;
     color: var(--text-0);
     background: var(--bg-0);
@@ -656,7 +683,7 @@
 
   .log-entries {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.8;
     color: var(--text-1);
     background: var(--bg-0);
@@ -710,24 +737,26 @@
     align-items: center;
     justify-content: center;
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--text-0);
     z-index: 1;
   }
 
-  /* --- Bottom bar (event stream) --- */
+  /* --- Bottom bar (event stream) - collapsible --- */
   .bottombar {
-    grid-column: 2 / 3;
     background: var(--bg-1);
     border-top: 1px solid var(--border);
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
+    max-height: 220px;
+    transition: max-height 0.25s ease;
     overflow: hidden;
   }
 
-  .app.inspector-open .bottombar {
-    grid-column: 2 / 3;
+  .bottombar.collapsed {
+    max-height: 38px;
   }
 
   .bottombar-header {
@@ -737,11 +766,13 @@
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
+    cursor: pointer;
+    user-select: none;
   }
 
   .bottombar-title {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -749,6 +780,27 @@
     display: flex;
     align-items: center;
     gap: 6px;
+  }
+
+  .bottombar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bottombar-toggle {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--text-2);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 4px;
+    transition: transform 0.25s ease;
+  }
+
+  .bottombar.collapsed .bottombar-toggle {
+    transform: rotate(180deg);
   }
 
   .live-dot {
@@ -765,7 +817,7 @@
     overflow-y: auto;
     padding: 8px 16px;
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.6;
   }
 
@@ -778,6 +830,7 @@
     gap: 10px;
     padding: 2px 0;
     animation: fadeInEvent 0.2s ease;
+    flex-wrap: wrap;
   }
 
   @keyframes fadeInEvent {
@@ -809,6 +862,7 @@
 
   .event-detail {
     color: var(--text-1);
+    word-break: break-all;
   }
 
   /* --- Toast notifications --- */
@@ -824,7 +878,7 @@
 
   .toast {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 12px;
     padding: 10px 16px;
     background: var(--bg-3);
     border: 1px solid var(--border-bright);
@@ -868,20 +922,21 @@
     border: 1px solid var(--border-bright);
     border-radius: 6px;
     padding: 24px;
-    min-width: 340px;
+    min-width: 300px;
+    max-width: 90vw;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
   }
 
   .dialog-title {
     font-family: var(--mono);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--red);
     margin-bottom: 12px;
   }
 
   .dialog-text {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-1);
     margin-bottom: 20px;
     line-height: 1.6;
@@ -905,10 +960,12 @@
     align-items: center;
     justify-content: center;
     height: 100%;
+    min-height: 200px;
     color: var(--text-2);
     font-family: var(--mono);
     text-align: center;
     gap: 12px;
+    padding: 32px 16px;
   }
 
   .no-queue-graphic {
@@ -924,58 +981,81 @@
     margin-bottom: 8px;
   }
 
-  /* --- Responsive --- */
-  @media (max-width: 900px) {
-    :root {
-      --sidebar-w: 0px;
-      --inspector-w: 0px;
-    }
-    .sidebar {
-      position: fixed;
-      left: -280px;
-      top: 0;
-      bottom: 0;
-      width: 280px;
-      z-index: 100;
-      transition: left 0.3s ease;
-    }
-    .sidebar.mobile-open {
-      left: 0;
-      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
-    }
-    .inspector {
-      position: fixed;
-      right: -380px;
-      top: 0;
-      bottom: 0;
-      width: 380px;
-      z-index: 100;
-      transition: right 0.3s ease;
-    }
-    .app.inspector-open .inspector {
-      right: 0;
-      box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
-    }
-    .app {
-      grid-template-columns: 1fr !important;
-    }
-    .mobile-toggle {
-      display: flex !important;
-    }
-  }
-
+  /* --- Mobile toggle: not needed in single-column, hidden by default --- */
   .mobile-toggle {
     display: none;
-    width: 32px;
-    height: 32px;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--bg-2);
-    color: var(--text-1);
-    cursor: pointer;
-    font-size: 16px;
+  }
+
+  /* --- Large screens: optional sidebar layout --- */
+  @media (min-width: 1200px) {
+    .app {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      grid-template-rows: 1fr auto;
+    }
+
+    .sidebar {
+      grid-row: 1 / 3;
+      border-bottom: none;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      padding: 16px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo-sub {
+      margin-left: 0;
+      margin-top: 4px;
+    }
+
+    .queue-list {
+      flex-direction: column;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 8px;
+      flex: 1;
+    }
+
+    .queue-list::-webkit-scrollbar { height: auto; width: 4px; }
+
+    .queue-card {
+      max-width: none;
+      flex-shrink: initial;
+    }
+
+    .queue-card.active {
+      box-shadow: inset 3px 0 0 var(--accent), 0 0 12px var(--accent-glow);
+    }
+
+    .queue-trend {
+      display: flex;
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      align-items: flex-end;
+      gap: 1px;
+      height: 16px;
+    }
+
+    .queue-card-name {
+      margin-bottom: 6px;
+    }
+
+    .queue-badges {
+      flex-wrap: wrap;
+    }
+
+    .bottombar {
+      grid-column: 2 / 3;
+    }
   }
 
   /* --- Loading skeleton --- */
@@ -1012,11 +1092,11 @@
   <main class="main" id="mainArea">
     <div class="no-queue" id="noQueueState">
       <div class="no-queue-graphic">&lt;/&gt;</div>
-      <div style="font-size: 13px; color: var(--text-1);">Select a queue</div>
-      <div style="font-size: 11px;">Pick a queue from the sidebar to inspect jobs</div>
+      <div style="font-size: 15px; color: var(--text-1);">Select a queue</div>
+      <div style="font-size: 12px;">Pick a queue from the list above to inspect jobs</div>
     </div>
 
-    <div id="queueView" style="display:none; flex-direction:column; height:100%;">
+    <div id="queueView" style="display:none; flex-direction:column; flex:1; min-height:0;">
       <div class="main-header">
         <div class="main-title">
           <button class="mobile-toggle" onclick="toggleSidebar()" title="Toggle sidebar">&#9776;</button>
@@ -1056,7 +1136,25 @@
     </div>
   </main>
 
-  <!-- Inspector -->
+  <!-- Bottom bar (collapsible) -->
+  <div class="bottombar" id="bottombar">
+    <div class="bottombar-header" onclick="toggleEventLog()">
+      <div class="bottombar-title">
+        <span class="live-dot"></span>
+        Event Stream
+      </div>
+      <div class="bottombar-actions">
+        <button class="btn-sm" onclick="clearEvents(); event.stopPropagation();">Clear</button>
+        <button class="bottombar-toggle" id="bottombarToggle" title="Toggle event log">&#9660;</button>
+      </div>
+    </div>
+    <div class="event-stream" id="eventStream"></div>
+  </div>
+
+  <!-- Inspector backdrop (click to close) -->
+  <div class="inspector-backdrop" id="inspectorBackdrop" onclick="closeInspector()"></div>
+
+  <!-- Inspector (fixed slide-over panel) -->
   <aside class="inspector" id="inspector">
     <div class="inspector-header">
       <div class="inspector-title">
@@ -1072,18 +1170,6 @@
     </div>
     <div class="inspector-body" id="inspectorBody"></div>
   </aside>
-
-  <!-- Bottom bar -->
-  <div class="bottombar">
-    <div class="bottombar-header">
-      <div class="bottombar-title">
-        <span class="live-dot"></span>
-        Event Stream
-      </div>
-      <button class="btn-sm" onclick="clearEvents()">Clear</button>
-    </div>
-    <div class="event-stream" id="eventStream"></div>
-  </div>
 </div>
 
 <!-- Toast container -->
@@ -1548,7 +1634,12 @@
     setTimeout(function() { el.remove(); }, 3000);
   }
 
-  // ---- Mobile ----
+  // ---- Event log toggle ----
+  window.toggleEventLog = function() {
+    document.getElementById('bottombar').classList.toggle('collapsed');
+  };
+
+  // ---- Mobile (legacy - kept for compatibility) ----
   window.toggleSidebar = function() {
     document.getElementById('sidebar').classList.toggle('mobile-open');
   };
