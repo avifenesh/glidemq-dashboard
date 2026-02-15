@@ -1,0 +1,35 @@
+{
+  "name": "@glidemq/dashboard",
+  "version": "0.1.0",
+  "description": "Web dashboard for glide-mq queue monitoring and management",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avifenesh/glidemq-dashboard.git"
+  },
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "glide-mq": ">=0.3.0",
+    "express": "^4 || ^5"
+  },
+  "devDependencies": {
+    "glide-mq": "^0.3.0",
+    "express": "^5",
+    "@types/express": "^5",
+    "@types/node": "^22",
+    "typescript": "^5"
+  },
+  "keywords": [
+    "glide-mq",
+    "dashboard",
+    "queue",
+    "monitor",
+    "valkey",
+    "redis"
+  ]
+}
