@@ -3,41 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GLIDE-MQ // Dashboard</title>
+<title>glide-mq dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
-
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --bg-0: #0a0c0f;
-    --bg-1: #0e1117;
-    --bg-2: #141820;
-    --bg-3: #1a1f2b;
-    --bg-4: #222836;
-    --border: #2a3040;
-    --border-bright: #3a4258;
-    --text-0: #c8cdd8;
-    --text-1: #8b92a5;
-    --text-2: #5c6377;
-    --accent: #00e59b;
-    --accent-dim: #00b87d;
-    --accent-glow: rgba(0, 229, 155, 0.15);
-    --red: #ff4d6a;
-    --red-dim: #cc3d55;
-    --red-glow: rgba(255, 77, 106, 0.12);
-    --blue: #4da6ff;
-    --blue-dim: #3d85cc;
-    --blue-glow: rgba(77, 166, 255, 0.12);
-    --yellow: #ffc44d;
-    --yellow-dim: #cc9d3d;
-    --yellow-glow: rgba(255, 196, 77, 0.12);
-    --gray: #6b7280;
-    --gray-dim: #4b5563;
-    --mono: 'IBM Plex Mono', 'Consolas', monospace;
-    --sans: 'DM Sans', -apple-system, sans-serif;
-    --radius: 4px;
-    --inspector-w: 400px;
+    --bg-0: #0a0a0a;
+    --bg-1: #111111;
+    --bg-2: #1a1a1a;
+    --bg-3: #252525;
+    --border: #2a2a2a;
+    --border-bright: #333;
+    --text-0: #ededed;
+    --text-1: #a1a1a1;
+    --text-2: #666666;
+    --accent: #0070f3;
+    --green: #50e3c2;
+    --red: #e5484d;
+    --yellow: #f5a623;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
   }
 
   html, body {
@@ -47,20 +35,71 @@
     font-family: var(--sans);
     font-size: 14px;
     line-height: 1.5;
-    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* --- Layout: single column, mobile-first --- */
+  /* ------------------------------------------------------------------ */
+  /*  LAYOUT                                                            */
+  /* ------------------------------------------------------------------ */
+
   .app {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
   }
 
-  /* --- Top bar (logo + queue selector) --- */
+  /* Desktop: sidebar + main */
+  @media (min-width: 901px) {
+    .app {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      grid-template-rows: 1fr auto;
+    }
+    .sidebar {
+      grid-row: 1 / 3;
+      flex-direction: column;
+      border-bottom: none;
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .sidebar-header {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 20px 16px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .queue-nav {
+      flex-direction: column;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 8px;
+      flex: 1;
+      gap: 2px;
+    }
+    .queue-nav::-webkit-scrollbar { width: 4px; }
+    .queue-nav::-webkit-scrollbar-track { background: transparent; }
+    .queue-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .queue-item {
+      flex-shrink: initial;
+      max-width: none;
+    }
+    .queue-item.active {
+      border-left: 2px solid var(--accent);
+      background: var(--bg-3);
+    }
+    .bottombar { grid-column: 2 / 3; }
+  }
+
+  /* ------------------------------------------------------------------ */
+  /*  SIDEBAR                                                           */
+  /* ------------------------------------------------------------------ */
+
   .sidebar {
     background: var(--bg-1);
     border-bottom: 1px solid var(--border);
+    display: flex;
     flex-shrink: 0;
   }
 
@@ -68,207 +107,252 @@
     padding: 12px 16px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
+    flex-shrink: 0;
   }
 
   .logo {
     font-family: var(--mono);
     font-size: 14px;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: 2px;
-    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-0);
+    letter-spacing: -0.3px;
+  }
+
+  /* Queue list: horizontal on mobile, vertical on desktop */
+  .queue-nav {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-  }
-
-  .logo::before {
-    content: '';
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    background: var(--accent);
-    border-radius: 50%;
-    box-shadow: 0 0 8px var(--accent), 0 0 16px rgba(0, 229, 155, 0.3);
-    animation: pulse-dot 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse-dot {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
-
-  .logo-sub {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text-2);
-    letter-spacing: 1px;
-    margin-left: auto;
-    flex-shrink: 0;
-  }
-
-  /* Queue list: horizontal scrollable row of badges/tabs */
-  .queue-list {
-    display: flex;
-    gap: 8px;
+    gap: 4px;
     padding: 0 16px 12px;
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
+    flex: 1;
   }
 
-  .queue-list::-webkit-scrollbar { height: 4px; }
-  .queue-list::-webkit-scrollbar-track { background: transparent; }
-  .queue-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .queue-nav::-webkit-scrollbar { height: 0; }
 
-  .queue-card {
+  .queue-item {
     flex-shrink: 0;
-    padding: 8px 14px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+    padding: 8px 12px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: all 0.15s ease;
-    position: relative;
+    transition: background 200ms ease;
+    border-left: 2px solid transparent;
     min-width: 0;
-    max-width: 260px;
+  }
+
+  .queue-item:hover {
     background: var(--bg-2);
   }
 
-  .queue-card:hover {
+  .queue-item.active {
     background: var(--bg-3);
-    border-color: var(--border-bright);
+    border-left-color: var(--accent);
   }
 
-  .queue-card.active {
-    background: var(--bg-3);
-    border-color: var(--accent);
-    box-shadow: 0 0 10px var(--accent-glow), inset 0 -2px 0 var(--accent);
-  }
-
-  .queue-card-name {
+  .queue-item-name {
     font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 500;
     color: var(--text-0);
-    margin-bottom: 4px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-bottom: 4px;
   }
 
-  .queue-badges {
+  .queue-item-counts {
     display: flex;
-    gap: 4px;
+    gap: 6px;
     flex-wrap: nowrap;
   }
 
-  .badge {
+  .inline-count {
     font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 500;
-    padding: 1px 5px;
-    border-radius: 2px;
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
-    line-height: 1;
+    font-size: 11px;
+    color: var(--text-2);
     white-space: nowrap;
   }
 
-  .badge-waiting { background: rgba(107, 114, 128, 0.15); color: var(--gray); }
-  .badge-active { background: var(--blue-glow); color: var(--blue); }
-  .badge-completed { background: var(--accent-glow); color: var(--accent); }
-  .badge-failed { background: var(--red-glow); color: var(--red); }
-  .badge-delayed { background: var(--yellow-glow); color: var(--yellow); }
+  .inline-count.has-value { color: var(--text-1); }
 
-  .badge-failed.has-failures {
-    animation: pulse-fail 1.5s ease-in-out infinite;
-  }
-  @keyframes pulse-fail {
-    0%, 100% { box-shadow: 0 0 0 0 transparent; }
-    50% { box-shadow: 0 0 8px var(--red-glow), 0 0 16px rgba(255, 77, 106, 0.08); }
-  }
+  /* ------------------------------------------------------------------ */
+  /*  MAIN AREA                                                         */
+  /* ------------------------------------------------------------------ */
 
-  /* Hide trend bars in horizontal mode - not enough space */
-  .queue-trend {
-    display: none;
-  }
-
-  .trend-bar {
-    width: 3px;
-    background: var(--accent);
-    opacity: 0.4;
-    border-radius: 1px 1px 0 0;
-    transition: height 0.3s ease;
-  }
-
-  /* --- Main area --- */
   .main {
     display: flex;
     flex-direction: column;
     flex: 1;
     overflow: hidden;
-    background: var(--bg-0);
     min-height: 0;
   }
 
-  .main-header {
-    padding: 12px 16px;
+  /* -- Overview (no queue selected) -- */
+
+  .overview {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+  }
+
+  .overview::-webkit-scrollbar { width: 6px; }
+  .overview::-webkit-scrollbar-track { background: transparent; }
+  .overview::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .metric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 32px;
+    max-width: 560px;
+  }
+
+  @media (max-width: 500px) {
+    .metric-grid { grid-template-columns: 1fr; }
+  }
+
+  .metric-card {
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+  }
+
+  .metric-label {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-2);
+    margin-bottom: 6px;
+  }
+
+  .metric-value {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+
+  .metric-value.green { color: var(--green); }
+  .metric-value.red { color: var(--red); }
+  .metric-value.gray { color: var(--text-1); }
+  .metric-value.blue { color: var(--accent); }
+
+  .overview-table-title {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-2);
+    margin-bottom: 12px;
+  }
+
+  .overview-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .overview-table th {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-2);
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .overview-table td {
+    font-size: 13px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-0);
+  }
+
+  .overview-table td.mono {
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  .overview-table tbody tr {
+    cursor: pointer;
+    transition: background 200ms ease;
+  }
+
+  .overview-table tbody tr:hover {
+    background: var(--bg-2);
+  }
+
+  /* -- Queue view (queue selected) -- */
+
+  .queue-view {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .queue-header {
+    padding: 14px 20px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
-    background: var(--bg-1);
     gap: 12px;
     flex-wrap: wrap;
+    background: var(--bg-1);
   }
 
-  .main-title {
-    font-family: var(--mono);
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-0);
+  .queue-header-left {
     display: flex;
     align-items: center;
     gap: 10px;
     min-width: 0;
   }
 
-  .main-title .queue-state {
-    font-size: 10px;
+  .queue-header-name {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-0);
+  }
+
+  .state-tag {
+    font-family: var(--mono);
+    font-size: 11px;
     font-weight: 500;
     padding: 2px 8px;
     border-radius: 2px;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    flex-shrink: 0;
+    letter-spacing: 0.5px;
   }
 
-  .state-running { background: var(--accent-glow); color: var(--accent); }
-  .state-paused { background: var(--yellow-glow); color: var(--yellow); }
+  .state-tag-running { background: rgba(80, 227, 194, 0.1); color: var(--green); }
+  .state-tag-paused  { background: rgba(245, 166, 35, 0.1); color: var(--yellow); }
 
-  .main-actions {
+  .queue-header-actions {
     display: flex;
     gap: 8px;
     flex-shrink: 0;
   }
 
   .btn {
-    font-family: var(--mono);
-    font-size: 12px;
+    font-family: var(--sans);
+    font-size: 13px;
     font-weight: 500;
     padding: 6px 14px;
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 4px;
     background: var(--bg-2);
     color: var(--text-1);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 200ms ease;
     white-space: nowrap;
   }
 
@@ -279,26 +363,31 @@
   }
 
   .btn-danger {
-    border-color: rgba(255, 77, 106, 0.3);
+    border-color: rgba(229, 72, 77, 0.3);
     color: var(--red);
   }
+
   .btn-danger:hover {
-    background: var(--red-glow);
-    border-color: var(--red-dim);
+    background: rgba(229, 72, 77, 0.1);
+    border-color: var(--red);
   }
 
-  .btn-accent {
-    border-color: rgba(0, 229, 155, 0.3);
-    color: var(--accent);
-  }
-  .btn-accent:hover {
-    background: var(--accent-glow);
-    border-color: var(--accent-dim);
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
   }
 
-  /* --- Filter tabs --- */
+  .btn-primary:hover {
+    background: #005cc5;
+    border-color: #005cc5;
+    color: #fff;
+  }
+
+  /* -- Filter tabs -- */
+
   .filter-bar {
-    padding: 0 16px;
+    padding: 0 20px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -309,19 +398,19 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  .filter-bar::-webkit-scrollbar { height: 0; }
+
   .filter-tab {
-    font-family: var(--mono);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
-    padding: 10px 12px;
+    padding: 10px 14px;
     color: var(--text-2);
     cursor: pointer;
     border-bottom: 2px solid transparent;
-    transition: all 0.15s ease;
-    position: relative;
-    user-select: none;
+    transition: color 200ms ease, border-color 200ms ease;
     white-space: nowrap;
     flex-shrink: 0;
+    user-select: none;
   }
 
   .filter-tab:hover {
@@ -329,45 +418,22 @@
   }
 
   .filter-tab.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-  }
-
-  .filter-tab .tab-count {
-    font-size: 10px;
-    margin-left: 4px;
-    opacity: 0.6;
-  }
-
-  .search-box {
-    margin-left: auto;
-    padding: 6px 10px;
-    font-family: var(--mono);
-    font-size: 12px;
-    background: var(--bg-2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
     color: var(--text-0);
-    outline: none;
-    width: 160px;
-    min-width: 100px;
-    flex-shrink: 1;
-    transition: border-color 0.15s ease;
+    border-bottom-color: var(--text-0);
   }
 
-  .search-box:focus {
-    border-color: var(--accent-dim);
-  }
-
-  .search-box::placeholder {
+  .filter-tab .count {
+    font-family: var(--mono);
+    font-size: 11px;
+    margin-left: 4px;
     color: var(--text-2);
   }
 
-  /* --- Job table --- */
+  /* -- Job table -- */
+
   .job-table-wrap {
     flex: 1;
     overflow: auto;
-    padding: 0;
     min-height: 0;
   }
 
@@ -377,7 +443,7 @@
 
   .job-table {
     width: 100%;
-    min-width: 500px;
+    min-width: 520px;
     border-collapse: collapse;
   }
 
@@ -388,13 +454,12 @@
   }
 
   .job-table th {
-    font-family: var(--mono);
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     color: var(--text-2);
-    padding: 10px 14px;
+    padding: 10px 16px;
     text-align: left;
     background: var(--bg-1);
     border-bottom: 1px solid var(--border);
@@ -402,15 +467,15 @@
   }
 
   .job-table td {
-    padding: 10px 14px;
-    border-bottom: 1px solid rgba(42, 48, 64, 0.5);
+    padding: 10px 16px;
     font-size: 13px;
     vertical-align: middle;
+    color: var(--text-0);
   }
 
-  .job-table tr {
+  .job-table tbody tr {
     cursor: pointer;
-    transition: background 0.1s ease;
+    transition: background 200ms ease;
   }
 
   .job-table tbody tr:hover {
@@ -419,135 +484,112 @@
 
   .job-table tbody tr.selected {
     background: var(--bg-3);
-    box-shadow: inset 3px 0 0 var(--accent);
   }
 
-  .job-id {
+  .cell-id {
     font-family: var(--mono);
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-1);
   }
 
-  .job-name {
-    font-family: var(--mono);
+  .cell-name {
     font-size: 13px;
     font-weight: 500;
     color: var(--text-0);
   }
 
-  .state-badge {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 2px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-  }
-
-  .state-waiting { background: rgba(107, 114, 128, 0.15); color: var(--gray); }
-  .state-active { background: var(--blue-glow); color: var(--blue); }
-  .state-completed { background: var(--accent-glow); color: var(--accent); }
-  .state-failed { background: var(--red-glow); color: var(--red); }
-  .state-delayed { background: var(--yellow-glow); color: var(--yellow); }
-
-  .job-time {
+  .cell-time {
     font-family: var(--mono);
     font-size: 12px;
     color: var(--text-2);
     white-space: nowrap;
   }
 
-  .job-actions-cell {
+  .job-state-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+
+  .jsb-waiting   { background: rgba(161,161,161,0.1);  color: var(--text-1); }
+  .jsb-active    { background: rgba(0,112,243,0.1);    color: var(--accent); }
+  .jsb-completed { background: rgba(80,227,194,0.1);   color: var(--green); }
+  .jsb-failed    { background: rgba(229,72,77,0.1);    color: var(--red); }
+  .jsb-delayed   { background: rgba(245,166,35,0.1);   color: var(--yellow); }
+
+  .action-cell {
     display: flex;
     gap: 4px;
   }
 
-  .btn-sm {
-    font-family: var(--mono);
-    font-size: 11px;
+  .btn-xs {
+    font-size: 12px;
+    font-weight: 500;
     padding: 4px 10px;
     border: 1px solid var(--border);
-    border-radius: 2px;
+    border-radius: 4px;
     background: transparent;
     color: var(--text-2);
     cursor: pointer;
-    transition: all 0.1s ease;
+    transition: all 200ms ease;
     white-space: nowrap;
   }
 
-  .btn-sm:hover {
+  .btn-xs:hover {
     border-color: var(--border-bright);
     color: var(--text-0);
     background: var(--bg-3);
   }
 
-  .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    min-height: 200px;
+  .empty-message {
+    text-align: center;
     color: var(--text-2);
-    font-family: var(--mono);
-    gap: 8px;
-    padding: 32px 16px;
+    padding: 48px 16px;
+    font-size: 13px;
   }
 
-  .empty-state-icon {
-    font-size: 32px;
-    opacity: 0.3;
-    margin-bottom: 8px;
+  /* ------------------------------------------------------------------ */
+  /*  INSPECTOR (slide-over)                                            */
+  /* ------------------------------------------------------------------ */
+
+  .inspector-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100;
   }
 
-  .empty-state-text {
-    font-size: 14px;
+  .inspector-backdrop.visible {
+    display: block;
   }
 
-  .empty-state-sub {
-    font-size: 12px;
-    opacity: 0.6;
-  }
-
-  /* --- Inspector: fixed slide-over panel from the right --- */
   .inspector {
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
-    width: min(var(--inspector-w), 90vw);
+    width: min(420px, 90vw);
     background: var(--bg-1);
     border-left: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    z-index: 200;
+    z-index: 101;
     transform: translateX(100%);
-    transition: transform 0.25s ease;
-    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
+    transition: transform 200ms ease;
   }
 
-  .app.inspector-open .inspector {
+  .inspector.open {
     transform: translateX(0);
   }
 
-  /* Backdrop overlay when inspector is open */
-  .inspector-backdrop {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 199;
-  }
-
-  .app.inspector-open .inspector-backdrop {
-    display: block;
-  }
-
   .inspector-header {
-    padding: 14px 16px;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -557,315 +599,317 @@
 
   .inspector-title {
     font-family: var(--mono);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--text-0);
-    display: flex;
-    align-items: center;
-    gap: 8px;
   }
 
   .inspector-close {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
     border: 1px solid var(--border);
-    background: var(--bg-2);
-    color: var(--text-1);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-2);
     cursor: pointer;
-    border-radius: var(--radius);
-    font-size: 18px;
-    transition: all 0.1s ease;
+    font-size: 16px;
+    transition: all 200ms ease;
   }
 
   .inspector-close:hover {
-    background: var(--bg-3);
-    border-color: var(--border-bright);
+    background: var(--bg-2);
     color: var(--text-0);
+    border-color: var(--border-bright);
   }
 
   .inspector-tabs {
     display: flex;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
+    padding: 0 20px;
   }
 
   .inspector-tab {
-    font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 500;
-    padding: 10px 16px;
+    padding: 10px 14px;
     color: var(--text-2);
     cursor: pointer;
     border-bottom: 2px solid transparent;
-    transition: all 0.15s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    transition: color 200ms ease, border-color 200ms ease;
+    user-select: none;
   }
 
   .inspector-tab:hover { color: var(--text-1); }
+
   .inspector-tab.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
+    color: var(--text-0);
+    border-bottom-color: var(--text-0);
   }
 
   .inspector-body {
     flex: 1;
     overflow-y: auto;
-    padding: 16px;
+    padding: 20px;
   }
 
   .inspector-body::-webkit-scrollbar { width: 4px; }
   .inspector-body::-webkit-scrollbar-track { background: transparent; }
   .inspector-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  .inspector-section {
-    margin-bottom: 16px;
-  }
-
-  .inspector-section-title {
-    font-family: var(--mono);
+  .section-label {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     color: var(--text-2);
     margin-bottom: 8px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid var(--border);
   }
 
-  .inspector-kv {
+  .section-label:not(:first-child) {
+    margin-top: 20px;
+  }
+
+  .json-block {
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    overflow-x: auto;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  .json-block::-webkit-scrollbar { width: 4px; }
+  .json-block::-webkit-scrollbar-track { background: transparent; }
+  .json-block::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .jk { color: var(--accent); }     /* keys */
+  .js { color: var(--green); }      /* strings */
+  .jn { color: var(--yellow); }     /* numbers */
+  .jb { color: var(--red); }        /* booleans */
+  .jnull { color: var(--text-2); }  /* null */
+
+  .log-list {
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.8;
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .log-list::-webkit-scrollbar { width: 4px; }
+  .log-list::-webkit-scrollbar-track { background: transparent; }
+  .log-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .log-line {
+    display: flex;
+    gap: 12px;
+    padding: 2px 0;
+  }
+
+  .log-num {
+    color: var(--text-2);
+    min-width: 24px;
+    text-align: right;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .log-text {
+    color: var(--text-1);
+    word-break: break-all;
+  }
+
+  .detail-grid {
     display: grid;
-    grid-template-columns: 100px 1fr;
-    gap: 6px 12px;
+    grid-template-columns: 110px 1fr;
+    gap: 8px 16px;
     font-size: 13px;
   }
 
-  .inspector-kv dt {
-    font-family: var(--mono);
+  .detail-key {
     font-size: 11px;
-    color: var(--text-2);
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
+    color: var(--text-2);
     padding-top: 2px;
   }
 
-  .inspector-kv dd {
+  .detail-val {
     font-family: var(--mono);
     font-size: 13px;
     color: var(--text-0);
     word-break: break-all;
   }
 
-  .json-viewer {
-    font-family: var(--mono);
-    font-size: 12px;
-    line-height: 1.6;
-    color: var(--text-0);
-    background: var(--bg-0);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px;
-    white-space: pre-wrap;
-    word-break: break-all;
-    max-height: 300px;
-    overflow-y: auto;
+  .detail-val.fail-reason {
+    color: var(--red);
   }
 
-  .json-key { color: var(--blue); }
-  .json-string { color: var(--accent); }
-  .json-number { color: var(--yellow); }
-  .json-boolean { color: var(--red); }
-  .json-null { color: var(--text-2); }
+  /* ------------------------------------------------------------------ */
+  /*  EVENT LOG (bottom bar)                                            */
+  /* ------------------------------------------------------------------ */
 
-  .log-entries {
-    font-family: var(--mono);
-    font-size: 12px;
-    line-height: 1.8;
-    color: var(--text-1);
-    background: var(--bg-0);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px;
-    max-height: 300px;
-    overflow-y: auto;
-  }
-
-  .log-entry {
-    padding: 2px 0;
-    border-bottom: 1px solid rgba(42, 48, 64, 0.3);
-  }
-
-  .log-entry:last-child { border-bottom: none; }
-
-  .progress-bar-wrap {
-    background: var(--bg-0);
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    height: 20px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent-dim), var(--accent));
-    transition: width 0.5s ease;
-    position: relative;
-  }
-
-  .progress-bar-fill::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
-    animation: shimmer 2s infinite;
-  }
-
-  @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
-
-  .progress-text {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-0);
-    z-index: 1;
-  }
-
-  /* --- Bottom bar (event stream) - collapsible --- */
   .bottombar {
     background: var(--bg-1);
     border-top: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    max-height: 220px;
-    transition: max-height 0.25s ease;
+    max-height: 200px;
+    transition: max-height 200ms ease;
     overflow: hidden;
   }
 
   .bottombar.collapsed {
-    max-height: 38px;
+    max-height: 36px;
   }
 
   .bottombar-header {
-    padding: 8px 16px;
-    border-bottom: 1px solid var(--border);
+    padding: 8px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
     cursor: pointer;
     user-select: none;
+    min-height: 36px;
   }
 
-  .bottombar-title {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-2);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .bottombar-actions {
+  .bottombar-left {
     display: flex;
     align-items: center;
     gap: 8px;
-  }
-
-  .bottombar-toggle {
-    font-family: var(--mono);
-    font-size: 14px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     color: var(--text-2);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0 4px;
-    transition: transform 0.25s ease;
-  }
-
-  .bottombar.collapsed .bottombar-toggle {
-    transform: rotate(180deg);
   }
 
   .live-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 6px var(--accent);
-    animation: pulse-dot 1.5s ease-in-out infinite;
+    background: var(--green);
+    flex-shrink: 0;
+  }
+
+  .event-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-2);
+  }
+
+  .bottombar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-clear {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-2);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    cursor: pointer;
+    transition: all 200ms ease;
+  }
+
+  .btn-clear:hover {
+    border-color: var(--border-bright);
+    color: var(--text-1);
+  }
+
+  .collapse-arrow {
+    font-size: 12px;
+    color: var(--text-2);
+    transition: transform 200ms ease;
+    line-height: 1;
+  }
+
+  .bottombar.collapsed .collapse-arrow {
+    transform: rotate(180deg);
   }
 
   .event-stream {
     flex: 1;
     overflow-y: auto;
-    padding: 8px 16px;
+    padding: 4px 20px 8px;
     font-family: var(--mono);
     font-size: 12px;
-    line-height: 1.6;
+    line-height: 1.7;
   }
 
   .event-stream::-webkit-scrollbar { width: 4px; }
   .event-stream::-webkit-scrollbar-track { background: transparent; }
   .event-stream::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  .event-line {
+  .evt {
     display: flex;
-    gap: 10px;
-    padding: 2px 0;
-    animation: fadeInEvent 0.2s ease;
-    flex-wrap: wrap;
+    gap: 12px;
+    padding: 1px 0;
   }
 
-  @keyframes fadeInEvent {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .event-time {
+  .evt-time {
     color: var(--text-2);
     flex-shrink: 0;
-    min-width: 70px;
+    min-width: 72px;
+    font-size: 12px;
   }
 
-  .event-type {
-    font-weight: 600;
+  .evt-queue {
+    color: var(--text-2);
     flex-shrink: 0;
-    min-width: 90px;
+    min-width: 80px;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
   }
 
-  .event-type.evt-completed { color: var(--accent); }
-  .event-type.evt-failed { color: var(--red); }
-  .event-type.evt-active { color: var(--blue); }
-  .event-type.evt-waiting { color: var(--gray); }
-  .event-type.evt-delayed { color: var(--yellow); }
-  .event-type.evt-progress { color: var(--yellow); }
-  .event-type.evt-paused { color: var(--yellow); }
-  .event-type.evt-resumed { color: var(--accent); }
-  .event-type.evt-removed { color: var(--red); }
+  .evt-type {
+    font-weight: 500;
+    flex-shrink: 0;
+    min-width: 80px;
+    font-size: 12px;
+  }
 
-  .event-detail {
+  .evt-type.t-completed { color: var(--green); }
+  .evt-type.t-failed    { color: var(--red); }
+  .evt-type.t-added,
+  .evt-type.t-active,
+  .evt-type.t-waiting   { color: var(--accent); }
+  .evt-type.t-retrying,
+  .evt-type.t-delayed   { color: var(--yellow); }
+
+  .evt-job {
     color: var(--text-1);
-    word-break: break-all;
+    font-size: 12px;
   }
 
-  /* --- Toast notifications --- */
+  /* ------------------------------------------------------------------ */
+  /*  TOAST                                                             */
+  /* ------------------------------------------------------------------ */
+
   .toast-container {
     position: fixed;
     top: 16px;
@@ -874,38 +918,40 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    pointer-events: none;
   }
 
   .toast {
-    font-family: var(--mono);
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: 500;
     padding: 10px 16px;
     background: var(--bg-3);
     border: 1px solid var(--border-bright);
-    border-radius: var(--radius);
+    border-radius: 6px;
     color: var(--text-0);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    animation: toastIn 0.2s ease, toastOut 0.3s ease 2.7s forwards;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    animation: toastIn 200ms ease, toastOut 200ms ease 2.8s forwards;
+    pointer-events: auto;
   }
 
-  .toast-success { border-left: 3px solid var(--accent); }
-  .toast-error { border-left: 3px solid var(--red); }
-  .toast-info { border-left: 3px solid var(--blue); }
+  .toast-success { border-left: 3px solid var(--green); }
+  .toast-error   { border-left: 3px solid var(--red); }
+  .toast-info    { border-left: 3px solid var(--accent); }
 
   @keyframes toastIn {
-    from { opacity: 0; transform: translateX(20px); }
-    to { opacity: 1; transform: translateX(0); }
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes toastOut {
     from { opacity: 1; }
-    to { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 0; transform: translateY(-8px); }
   }
 
-  /* --- Confirm dialog --- */
+  /* ------------------------------------------------------------------ */
+  /*  CONFIRM DIALOG                                                    */
+  /* ------------------------------------------------------------------ */
+
   .dialog-overlay {
     position: fixed;
     inset: 0;
@@ -914,25 +960,23 @@
     align-items: center;
     justify-content: center;
     z-index: 10001;
-    animation: fadeIn 0.15s ease;
   }
 
   .dialog {
-    background: var(--bg-2);
+    background: var(--bg-1);
     border: 1px solid var(--border-bright);
     border-radius: 6px;
     padding: 24px;
-    min-width: 300px;
+    min-width: 320px;
     max-width: 90vw;
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   }
 
   .dialog-title {
-    font-family: var(--mono);
     font-size: 15px;
     font-weight: 600;
-    color: var(--red);
-    margin-bottom: 12px;
+    color: var(--text-0);
+    margin-bottom: 8px;
   }
 
   .dialog-text {
@@ -947,129 +991,6 @@
     gap: 8px;
     justify-content: flex-end;
   }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  /* --- No queue selected --- */
-  .no-queue {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    min-height: 200px;
-    color: var(--text-2);
-    font-family: var(--mono);
-    text-align: center;
-    gap: 12px;
-    padding: 32px 16px;
-  }
-
-  .no-queue-graphic {
-    width: 80px;
-    height: 40px;
-    border: 2px dashed var(--border);
-    border-radius: var(--radius);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-2);
-    font-size: 18px;
-    margin-bottom: 8px;
-  }
-
-  /* --- Mobile toggle: not needed in single-column, hidden by default --- */
-  .mobile-toggle {
-    display: none;
-  }
-
-  /* --- Large screens: optional sidebar layout --- */
-  @media (min-width: 1200px) {
-    .app {
-      display: grid;
-      grid-template-columns: 260px 1fr;
-      grid-template-rows: 1fr auto;
-    }
-
-    .sidebar {
-      grid-row: 1 / 3;
-      border-bottom: none;
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .sidebar-header {
-      padding: 16px;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 4px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .logo-sub {
-      margin-left: 0;
-      margin-top: 4px;
-    }
-
-    .queue-list {
-      flex-direction: column;
-      overflow-x: hidden;
-      overflow-y: auto;
-      padding: 8px;
-      flex: 1;
-    }
-
-    .queue-list::-webkit-scrollbar { height: auto; width: 4px; }
-
-    .queue-card {
-      max-width: none;
-      flex-shrink: initial;
-    }
-
-    .queue-card.active {
-      box-shadow: inset 3px 0 0 var(--accent), 0 0 12px var(--accent-glow);
-    }
-
-    .queue-trend {
-      display: flex;
-      position: absolute;
-      right: 12px;
-      top: 10px;
-      align-items: flex-end;
-      gap: 1px;
-      height: 16px;
-    }
-
-    .queue-card-name {
-      margin-bottom: 6px;
-    }
-
-    .queue-badges {
-      flex-wrap: wrap;
-    }
-
-    .bottombar {
-      grid-column: 2 / 3;
-    }
-  }
-
-  /* --- Loading skeleton --- */
-  .skeleton {
-    background: linear-gradient(90deg, var(--bg-2) 25%, var(--bg-3) 50%, var(--bg-2) 75%);
-    background-size: 200% 100%;
-    animation: skeleton-shimmer 1.5s infinite;
-    border-radius: 2px;
-  }
-
-  @keyframes skeleton-shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
 </style>
 </head>
 <body>
@@ -1078,45 +999,68 @@
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <div class="logo">GLIDE-MQ</div>
-      <div class="logo-sub">Dashboard // Monitor</div>
+      <div class="logo">glide-mq</div>
     </div>
-    <div class="queue-list" id="queueList">
-      <div class="empty-state" style="padding: 24px 0;">
-        <div class="empty-state-text">Loading queues...</div>
-      </div>
-    </div>
+    <div class="queue-nav" id="queueNav"></div>
   </aside>
 
-  <!-- Main content -->
-  <main class="main" id="mainArea">
-    <div class="no-queue" id="noQueueState">
-      <div class="no-queue-graphic">&lt;/&gt;</div>
-      <div style="font-size: 15px; color: var(--text-1);">Select a queue</div>
-      <div style="font-size: 12px;">Pick a queue from the list above to inspect jobs</div>
+  <!-- Main -->
+  <main class="main" id="main">
+    <!-- Overview: shown when no queue selected -->
+    <div class="overview" id="overview">
+      <div class="metric-grid" id="metricGrid">
+        <div class="metric-card">
+          <div class="metric-label">Total Processed</div>
+          <div class="metric-value green" id="mCompleted">0</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Total Failed</div>
+          <div class="metric-value red" id="mFailed">0</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Total Waiting</div>
+          <div class="metric-value gray" id="mWaiting">0</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Total Active</div>
+          <div class="metric-value blue" id="mActive">0</div>
+        </div>
+      </div>
+      <div class="overview-table-title">Queues</div>
+      <table class="overview-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Waiting</th>
+            <th>Active</th>
+            <th>Completed</th>
+            <th>Failed</th>
+          </tr>
+        </thead>
+        <tbody id="overviewBody"></tbody>
+      </table>
     </div>
 
-    <div id="queueView" style="display:none; flex-direction:column; flex:1; min-height:0;">
-      <div class="main-header">
-        <div class="main-title">
-          <button class="mobile-toggle" onclick="toggleSidebar()" title="Toggle sidebar">&#9776;</button>
-          <span id="selectedQueueName">--</span>
-          <span class="queue-state state-running" id="queueStateLabel">RUNNING</span>
+    <!-- Queue view: shown when queue selected -->
+    <div class="queue-view" id="queueView">
+      <div class="queue-header">
+        <div class="queue-header-left">
+          <span class="queue-header-name" id="queueName">--</span>
+          <span class="state-tag state-tag-running" id="queueStateTag">RUNNING</span>
         </div>
-        <div class="main-actions">
-          <button class="btn btn-accent" id="btnPauseResume" onclick="togglePause()">PAUSE</button>
-          <button class="btn btn-danger" onclick="obliterateQueue()">OBLITERATE</button>
+        <div class="queue-header-actions">
+          <button class="btn" id="btnPauseResume" onclick="S.togglePause()">Pause</button>
+          <button class="btn btn-danger" onclick="S.obliterate()">Obliterate</button>
         </div>
       </div>
 
-      <div class="filter-bar">
-        <div class="filter-tab active" data-state="" onclick="setFilter(this, '')">All<span class="tab-count" id="countAll"></span></div>
-        <div class="filter-tab" data-state="waiting" onclick="setFilter(this, 'waiting')">Waiting<span class="tab-count" id="countWaiting"></span></div>
-        <div class="filter-tab" data-state="active" onclick="setFilter(this, 'active')">Active<span class="tab-count" id="countActive"></span></div>
-        <div class="filter-tab" data-state="delayed" onclick="setFilter(this, 'delayed')">Delayed<span class="tab-count" id="countDelayed"></span></div>
-        <div class="filter-tab" data-state="completed" onclick="setFilter(this, 'completed')">Completed<span class="tab-count" id="countCompleted"></span></div>
-        <div class="filter-tab" data-state="failed" onclick="setFilter(this, 'failed')">Failed<span class="tab-count" id="countFailed"></span></div>
-        <input class="search-box" type="text" placeholder="Search jobs..." id="jobSearch" oninput="filterJobs()">
+      <div class="filter-bar" id="filterBar">
+        <div class="filter-tab active" data-f="" onclick="S.setFilter(this,'')">All<span class="count" id="fAll"></span></div>
+        <div class="filter-tab" data-f="waiting" onclick="S.setFilter(this,'waiting')">Waiting<span class="count" id="fWaiting"></span></div>
+        <div class="filter-tab" data-f="active" onclick="S.setFilter(this,'active')">Active<span class="count" id="fActive"></span></div>
+        <div class="filter-tab" data-f="delayed" onclick="S.setFilter(this,'delayed')">Delayed<span class="count" id="fDelayed"></span></div>
+        <div class="filter-tab" data-f="completed" onclick="S.setFilter(this,'completed')">Completed<span class="count" id="fCompleted"></span></div>
+        <div class="filter-tab" data-f="failed" onclick="S.setFilter(this,'failed')">Failed<span class="count" id="fFailed"></span></div>
       </div>
 
       <div class="job-table-wrap" id="jobTableWrap">
@@ -1130,47 +1074,45 @@
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="jobTableBody"></tbody>
+          <tbody id="jobBody"></tbody>
         </table>
       </div>
     </div>
   </main>
 
-  <!-- Bottom bar (collapsible) -->
+  <!-- Bottom bar -->
   <div class="bottombar" id="bottombar">
-    <div class="bottombar-header" onclick="toggleEventLog()">
-      <div class="bottombar-title">
+    <div class="bottombar-header" onclick="S.toggleEvents()">
+      <div class="bottombar-left">
         <span class="live-dot"></span>
-        Event Stream
+        <span>Events</span>
+        <span class="event-count" id="eventCount">0</span>
       </div>
-      <div class="bottombar-actions">
-        <button class="btn-sm" onclick="clearEvents(); event.stopPropagation();">Clear</button>
-        <button class="bottombar-toggle" id="bottombarToggle" title="Toggle event log">&#9660;</button>
+      <div class="bottombar-right">
+        <button class="btn-clear" onclick="S.clearEvents(); event.stopPropagation();">Clear</button>
+        <span class="collapse-arrow" id="collapseArrow">&#9660;</span>
       </div>
     </div>
     <div class="event-stream" id="eventStream"></div>
   </div>
-
-  <!-- Inspector backdrop (click to close) -->
-  <div class="inspector-backdrop" id="inspectorBackdrop" onclick="closeInspector()"></div>
-
-  <!-- Inspector (fixed slide-over panel) -->
-  <aside class="inspector" id="inspector">
-    <div class="inspector-header">
-      <div class="inspector-title">
-        <span>JOB</span>
-        <span id="inspectorJobId" style="color: var(--accent);">--</span>
-      </div>
-      <button class="inspector-close" onclick="closeInspector()" title="Close (Esc)">&times;</button>
-    </div>
-    <div class="inspector-tabs">
-      <div class="inspector-tab active" onclick="setInspectorTab(this, 'data')">Data</div>
-      <div class="inspector-tab" onclick="setInspectorTab(this, 'logs')">Logs</div>
-      <div class="inspector-tab" onclick="setInspectorTab(this, 'details')">Details</div>
-    </div>
-    <div class="inspector-body" id="inspectorBody"></div>
-  </aside>
 </div>
+
+<!-- Inspector backdrop -->
+<div class="inspector-backdrop" id="inspectorBackdrop" onclick="S.closeInspector()"></div>
+
+<!-- Inspector -->
+<aside class="inspector" id="inspector">
+  <div class="inspector-header">
+    <div class="inspector-title" id="inspectorTitle">Job #--</div>
+    <button class="inspector-close" onclick="S.closeInspector()" title="Close (Esc)">&times;</button>
+  </div>
+  <div class="inspector-tabs">
+    <div class="inspector-tab active" onclick="S.setInspectorTab(this,'data')">Data</div>
+    <div class="inspector-tab" onclick="S.setInspectorTab(this,'logs')">Logs</div>
+    <div class="inspector-tab" onclick="S.setInspectorTab(this,'details')">Details</div>
+  </div>
+  <div class="inspector-body" id="inspectorBody"></div>
+</aside>
 
 <!-- Toast container -->
 <div class="toast-container" id="toastContainer"></div>
@@ -1179,311 +1121,393 @@
 (function() {
   'use strict';
 
-  // ---- State ----
-  let queues = [];
-  let selectedQueue = null;
-  let selectedJob = null;
-  let currentFilter = '';
-  let currentJobs = [];
-  let isPaused = false;
-  let inspectorTab = 'data';
-  let jobDetail = null;
-  let eventSource = null;
-  let refreshInterval = null;
+  // -- State --
+  var queues = [];
+  var selectedQueue = null;
+  var currentFilter = '';
+  var jobs = [];
+  var inspectedJob = null;
+  var inspectedJobData = null;
+  var inspectorTab = 'data';
+  var isPaused = false;
+  var eventSource = null;
+  var eventCount = 0;
 
-  // ---- API helpers ----
-  const BASE = window.location.pathname.replace(/\/$/, '');
+  // -- API base --
+  var BASE = window.location.pathname.replace(/\/$/, '');
 
-  async function api(path, opts) {
-    try {
-      const res = await fetch(BASE + path, opts);
-      if (!res.ok) throw new Error(res.statusText);
-      const ct = res.headers.get('content-type') || '';
-      if (ct.includes('json')) return res.json();
-      return res.text();
-    } catch (err) {
-      console.error('[API]', path, err);
-      throw err;
-    }
+  // -- DOM refs --
+  var $ = function(id) { return document.getElementById(id); };
+
+  // -- Helpers --
+  function esc(s) {
+    if (s == null) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // ---- Queue list ----
+  function relTime(ts) {
+    var d = new Date(typeof ts === 'number' ? ts : parseInt(ts, 10));
+    if (isNaN(d.getTime())) return '-';
+    var diff = Date.now() - d.getTime();
+    if (diff < 60000) return Math.max(0, Math.floor(diff / 1000)) + 's ago';
+    if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+    return d.toLocaleDateString();
+  }
+
+  function fullTime(ts) {
+    var d = new Date(typeof ts === 'number' ? ts : parseInt(ts, 10));
+    if (isNaN(d.getTime())) return '-';
+    return d.toLocaleString();
+  }
+
+  function shortTime(ts) {
+    var d = new Date(ts);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  function syntaxHL(json) {
+    if (!json) return '';
+    var s = esc(json);
+    return s.replace(
+      /("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+      function(m) {
+        var c = 'jn';
+        if (/^"/.test(m)) {
+          if (/:$/.test(m)) {
+            c = 'jk';
+            return '<span class="' + c + '">' + m.slice(0, -1) + '</span>:';
+          }
+          c = 'js';
+        } else if (/true|false/.test(m)) {
+          c = 'jb';
+        } else if (/null/.test(m)) {
+          c = 'jnull';
+        }
+        return '<span class="' + c + '">' + m + '</span>';
+      }
+    );
+  }
+
+  // -- API --
+  async function api(path, opts) {
+    var res = await fetch(BASE + path, opts);
+    if (!res.ok) throw new Error(res.statusText);
+    var ct = res.headers.get('content-type') || '';
+    if (ct.includes('json')) return res.json();
+    return res.text();
+  }
+
+  // -- Toast --
+  function toast(msg, type) {
+    type = type || 'info';
+    var el = document.createElement('div');
+    el.className = 'toast toast-' + type;
+    el.textContent = msg;
+    $('toastContainer').appendChild(el);
+    setTimeout(function() { el.remove(); }, 3000);
+  }
+
+  // -- Confirm --
+  function confirm(title, text, onOk) {
+    var ov = document.createElement('div');
+    ov.className = 'dialog-overlay';
+    ov.innerHTML =
+      '<div class="dialog">' +
+        '<div class="dialog-title">' + esc(title) + '</div>' +
+        '<div class="dialog-text">' + esc(text) + '</div>' +
+        '<div class="dialog-actions">' +
+          '<button class="btn" id="_dlgCancel">Cancel</button>' +
+          '<button class="btn btn-danger" id="_dlgOk">Confirm</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(ov);
+    ov.querySelector('#_dlgCancel').onclick = function() { ov.remove(); };
+    ov.querySelector('#_dlgOk').onclick = function() { ov.remove(); onOk(); };
+    ov.addEventListener('click', function(e) { if (e.target === ov) ov.remove(); });
+  }
+
+  // -- Load queues --
   async function loadQueues() {
     try {
-      const data = await api('/api/queues');
+      var data = await api('/api/queues');
       queues = Array.isArray(data) ? data : [];
-      renderQueueList();
     } catch (e) {
-      document.getElementById('queueList').innerHTML =
-        '<div class="empty-state" style="padding:24px 0"><div class="empty-state-text">Failed to load queues</div></div>';
+      // keep existing
     }
+    renderSidebar();
+    if (!selectedQueue) renderOverview();
+    if (selectedQueue) updateFilterCounts();
   }
 
-  function renderQueueList() {
-    const el = document.getElementById('queueList');
+  // -- Render sidebar --
+  function renderSidebar() {
+    var nav = $('queueNav');
     if (!queues.length) {
-      el.innerHTML = '<div class="empty-state" style="padding:24px 0"><div class="empty-state-text">No queues found</div></div>';
+      nav.innerHTML = '<div style="padding:24px 12px;color:var(--text-2);font-size:13px;">No queues</div>';
       return;
     }
-    el.innerHTML = queues.map(q => {
-      const name = q.name || q;
-      const counts = q.counts || {};
-      const w = counts.waiting || 0;
-      const a = counts.active || 0;
-      const c = counts.completed || 0;
-      const f = counts.failed || 0;
-      const d = counts.delayed || 0;
-      const isActive = selectedQueue === name;
-      const failClass = f > 0 ? 'has-failures' : '';
-
-      // Generate trend bars from recent activity
-      const total = w + a + c + f + d;
-      const bars = [w, a, d, c, f].map(v => {
-        const h = total > 0 ? Math.max(2, Math.round((v / total) * 16)) : 2;
-        return '<div class="trend-bar" style="height:' + h + 'px"></div>';
-      }).join('');
-
-      return '<div class="queue-card' + (isActive ? ' active' : '') + '" onclick="selectQueue(\'' + name + '\')">' +
-        '<div class="queue-trend">' + bars + '</div>' +
-        '<div class="queue-card-name">' + escHtml(name) + '</div>' +
-        '<div class="queue-badges">' +
-          '<span class="badge badge-waiting">W ' + w + '</span>' +
-          '<span class="badge badge-active">A ' + a + '</span>' +
-          '<span class="badge badge-delayed">D ' + d + '</span>' +
-          '<span class="badge badge-completed">C ' + c + '</span>' +
-          '<span class="badge badge-failed ' + failClass + '">F ' + f + '</span>' +
+    nav.innerHTML = queues.map(function(q) {
+      var name = q.name || q;
+      var c = q.counts || {};
+      var active = selectedQueue === name;
+      return '<div class="queue-item' + (active ? ' active' : '') + '" onclick="S.selectQueue(\'' + esc(name) + '\')">' +
+        '<div class="queue-item-name">' + esc(name) + '</div>' +
+        '<div class="queue-item-counts">' +
+          countSpan('W', c.waiting) +
+          countSpan('A', c.active) +
+          countSpan('F', c.failed) +
         '</div>' +
       '</div>';
     }).join('');
   }
 
-  // ---- Queue selection ----
-  window.selectQueue = async function(name) {
+  function countSpan(label, n) {
+    n = n || 0;
+    return '<span class="inline-count' + (n > 0 ? ' has-value' : '') + '">' + label + ':' + n + '</span>';
+  }
+
+  // -- Render overview --
+  function renderOverview() {
+    var tw = 0, ta = 0, tc = 0, tf = 0;
+    queues.forEach(function(q) {
+      var c = q.counts || {};
+      tw += c.waiting || 0;
+      ta += c.active || 0;
+      tc += c.completed || 0;
+      tf += c.failed || 0;
+    });
+    $('mCompleted').textContent = tc.toLocaleString();
+    $('mFailed').textContent = tf.toLocaleString();
+    $('mWaiting').textContent = tw.toLocaleString();
+    $('mActive').textContent = ta.toLocaleString();
+
+    var tbody = $('overviewBody');
+    if (!queues.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-message">No queues found</td></tr>';
+      return;
+    }
+    tbody.innerHTML = queues.map(function(q) {
+      var name = q.name || q;
+      var c = q.counts || {};
+      return '<tr onclick="S.selectQueue(\'' + esc(name) + '\')">' +
+        '<td class="mono">' + esc(name) + '</td>' +
+        '<td>' + (c.waiting || 0) + '</td>' +
+        '<td>' + (c.active || 0) + '</td>' +
+        '<td>' + (c.completed || 0) + '</td>' +
+        '<td>' + (c.failed || 0) + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  // -- Select queue --
+  async function selectQueue(name) {
     selectedQueue = name;
-    selectedJob = null;
-    jobDetail = null;
+    inspectedJob = null;
+    inspectedJobData = null;
+    currentFilter = '';
     isPaused = false;
     closeInspector();
-    renderQueueList();
 
-    const noQ = document.getElementById('noQueueState');
-    const qv = document.getElementById('queueView');
-    noQ.style.display = 'none';
-    qv.style.display = 'flex';
-    document.getElementById('selectedQueueName').textContent = name;
+    // Reset filter tabs
+    var tabs = $('filterBar').querySelectorAll('.filter-tab');
+    tabs.forEach(function(t) { t.classList.remove('active'); });
+    tabs[0].classList.add('active');
 
-    updateQueueState();
+    // Check paused state from queue data
+    var q = queues.find(function(q) { return (q.name || q) === name; });
+    if (q && q.paused) isPaused = true;
+
+    $('overview').style.display = 'none';
+    $('queueView').style.display = 'flex';
+    $('queueName').textContent = name;
+    updateStateTag();
+    renderSidebar();
+    updateFilterCounts();
     await loadJobs();
-  };
+  }
 
-  function updateQueueState() {
-    const label = document.getElementById('queueStateLabel');
-    const btn = document.getElementById('btnPauseResume');
+  function updateStateTag() {
+    var tag = $('queueStateTag');
+    var btn = $('btnPauseResume');
     if (isPaused) {
-      label.textContent = 'PAUSED';
-      label.className = 'queue-state state-paused';
-      btn.textContent = 'RESUME';
+      tag.textContent = 'PAUSED';
+      tag.className = 'state-tag state-tag-paused';
+      btn.textContent = 'Resume';
     } else {
-      label.textContent = 'RUNNING';
-      label.className = 'queue-state state-running';
-      btn.textContent = 'PAUSE';
+      tag.textContent = 'RUNNING';
+      tag.className = 'state-tag state-tag-running';
+      btn.textContent = 'Pause';
     }
   }
 
-  // ---- Jobs ----
+  function deselectQueue() {
+    selectedQueue = null;
+    inspectedJob = null;
+    closeInspector();
+    $('overview').style.display = '';
+    $('queueView').style.display = 'none';
+    renderSidebar();
+    renderOverview();
+  }
+
+  // -- Load jobs --
   async function loadJobs() {
     if (!selectedQueue) return;
-    const stateParam = currentFilter ? '?state=' + currentFilter + '&start=0&end=100' : '?start=0&end=100';
+    var params = currentFilter
+      ? '?state=' + currentFilter + '&start=0&end=50'
+      : '?start=0&end=50';
     try {
-      const data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/jobs' + stateParam);
-      currentJobs = Array.isArray(data) ? data : [];
-      renderJobs();
-      updateFilterCounts();
+      var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/jobs' + params);
+      jobs = Array.isArray(data) ? data : [];
     } catch (e) {
-      document.getElementById('jobTableBody').innerHTML =
-        '<tr><td colspan="5" style="text-align:center;color:var(--text-2);padding:32px;">Failed to load jobs</td></tr>';
+      jobs = [];
     }
+    renderJobs();
   }
 
   function renderJobs() {
-    const search = (document.getElementById('jobSearch').value || '').toLowerCase();
-    const tbody = document.getElementById('jobTableBody');
-    let filtered = currentJobs;
-    if (search) {
-      filtered = filtered.filter(j =>
-        (j.id || '').toString().toLowerCase().includes(search) ||
-        (j.name || '').toLowerCase().includes(search)
-      );
-    }
-
-    if (!filtered.length) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-2);padding:32px;font-family:var(--mono);font-size:12px;">No jobs found</td></tr>';
+    var tbody = $('jobBody');
+    if (!jobs.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-message">No jobs</td></tr>';
       return;
     }
-
-    tbody.innerHTML = filtered.map(j => {
-      const state = j.state || 'waiting';
-      const isSelected = selectedJob === j.id;
-      const ts = j.timestamp ? formatTime(j.timestamp) : '-';
-      const showRetry = state === 'failed';
-      return '<tr class="' + (isSelected ? 'selected' : '') + '" onclick="inspectJob(\'' + j.id + '\')">' +
-        '<td class="job-id">' + escHtml(String(j.id)) + '</td>' +
-        '<td class="job-name">' + escHtml(j.name || '-') + '</td>' +
-        '<td><span class="state-badge state-' + state + '">' + state + '</span></td>' +
-        '<td class="job-time">' + ts + '</td>' +
-        '<td><div class="job-actions-cell">' +
-          (showRetry ? '<button class="btn-sm" onclick="retryJob(event,\'' + j.id + '\')">Retry</button>' : '') +
-          '<button class="btn-sm" onclick="removeJob(event,\'' + j.id + '\')">Remove</button>' +
+    tbody.innerHTML = jobs.map(function(j) {
+      var state = j.state || 'waiting';
+      var sel = inspectedJob === String(j.id);
+      var ts = j.timestamp ? relTime(j.timestamp) : '-';
+      var showRetry = state === 'failed';
+      return '<tr class="' + (sel ? 'selected' : '') + '" onclick="S.inspectJob(\'' + esc(String(j.id)) + '\')">' +
+        '<td class="cell-id">' + esc(String(j.id)) + '</td>' +
+        '<td class="cell-name">' + esc(j.name || '-') + '</td>' +
+        '<td><span class="job-state-badge jsb-' + state + '">' + state + '</span></td>' +
+        '<td class="cell-time">' + ts + '</td>' +
+        '<td><div class="action-cell">' +
+          (showRetry ? '<button class="btn-xs" onclick="S.retryJob(event,\'' + esc(String(j.id)) + '\')">Retry</button>' : '') +
+          '<button class="btn-xs" onclick="S.removeJob(event,\'' + esc(String(j.id)) + '\')">Remove</button>' +
         '</div></td>' +
       '</tr>';
     }).join('');
   }
 
+  // -- Filter counts --
   function updateFilterCounts() {
-    // If we have queue-level counts from the sidebar data, use those
-    const q = queues.find(q => (q.name || q) === selectedQueue);
-    if (q && q.counts) {
-      const c = q.counts;
-      setCountText('countAll', sum(c));
-      setCountText('countWaiting', c.waiting || 0);
-      setCountText('countActive', c.active || 0);
-      setCountText('countDelayed', c.delayed || 0);
-      setCountText('countCompleted', c.completed || 0);
-      setCountText('countFailed', c.failed || 0);
-    }
+    var q = queues.find(function(q) { return (q.name || q) === selectedQueue; });
+    if (!q || !q.counts) return;
+    var c = q.counts;
+    var total = (c.waiting||0) + (c.active||0) + (c.delayed||0) + (c.completed||0) + (c.failed||0);
+    setCount('fAll', total);
+    setCount('fWaiting', c.waiting);
+    setCount('fActive', c.active);
+    setCount('fDelayed', c.delayed);
+    setCount('fCompleted', c.completed);
+    setCount('fFailed', c.failed);
   }
 
-  function sum(c) {
-    return (c.waiting || 0) + (c.active || 0) + (c.delayed || 0) + (c.completed || 0) + (c.failed || 0);
+  function setCount(id, n) {
+    var el = $(id);
+    if (el) el.textContent = n ? ' ' + n : '';
   }
 
-  function setCountText(id, n) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = n > 0 ? '(' + n + ')' : '';
-  }
-
-  window.setFilter = function(tab, state) {
+  function setFilter(tab, state) {
     currentFilter = state;
-    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    $('filterBar').querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
     tab.classList.add('active');
     loadJobs();
-  };
+  }
 
-  window.filterJobs = function() {
+  // -- Inspector --
+  async function inspectJob(id) {
+    inspectedJob = String(id);
+    inspectorTab = 'data';
     renderJobs();
-  };
 
-  // ---- Job inspection ----
-  window.inspectJob = async function(id) {
-    selectedJob = id;
-    renderJobs(); // highlight row
+    $('inspectorBackdrop').classList.add('visible');
+    $('inspector').classList.add('open');
+    $('inspectorTitle').textContent = 'Job #' + id;
 
-    const app = document.getElementById('app');
-    app.classList.add('inspector-open');
-
-    document.getElementById('inspectorJobId').textContent = '#' + id;
+    // Reset tabs
+    $('inspector').querySelectorAll('.inspector-tab').forEach(function(t) { t.classList.remove('active'); });
+    $('inspector').querySelector('.inspector-tab').classList.add('active');
 
     try {
-      jobDetail = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/job/' + encodeURIComponent(id));
-      renderInspector();
+      inspectedJobData = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/job/' + encodeURIComponent(id));
+      renderInspectorBody();
     } catch (e) {
-      document.getElementById('inspectorBody').innerHTML =
-        '<div style="color:var(--text-2);padding:16px;font-family:var(--mono);font-size:12px;">Failed to load job details</div>';
+      $('inspectorBody').innerHTML = '<div class="empty-message">Failed to load job details</div>';
     }
-  };
+  }
 
-  function renderInspector() {
-    if (!jobDetail) return;
-    const body = document.getElementById('inspectorBody');
-    const j = jobDetail;
+  function renderInspectorBody() {
+    if (!inspectedJobData) return;
+    var j = inspectedJobData;
+    var body = $('inspectorBody');
 
     if (inspectorTab === 'data') {
-      const dataHtml = j.data ? syntaxHighlight(JSON.stringify(j.data, null, 2)) : '<span class="json-null">null</span>';
-      let progressHtml = '';
-      const prog = j.progress;
-      if (typeof prog === 'number') {
-        const pct = Math.round(prog * 100) / 100;
-        progressHtml = '<div class="inspector-section">' +
-          '<div class="inspector-section-title">Progress</div>' +
-          '<div class="progress-bar-wrap">' +
-            '<div class="progress-text">' + pct + '%</div>' +
-            '<div class="progress-bar-fill" style="width:' + Math.min(100, pct) + '%"></div>' +
-          '</div>' +
-        '</div>';
-      } else if (prog && typeof prog === 'object') {
-        progressHtml = '<div class="inspector-section">' +
-          '<div class="inspector-section-title">Progress</div>' +
-          '<div class="json-viewer">' + syntaxHighlight(JSON.stringify(prog, null, 2)) + '</div>' +
-        '</div>';
+      var dataStr = j.data ? syntaxHL(JSON.stringify(j.data, null, 2)) : '<span class="jnull">null</span>';
+      var html = '<div class="section-label">Job Data</div>' +
+        '<div class="json-block">' + dataStr + '</div>';
+
+      if (j.returnvalue != null) {
+        html += '<div class="section-label">Return Value</div>' +
+          '<div class="json-block">' + syntaxHL(JSON.stringify(j.returnvalue, null, 2)) + '</div>';
       }
 
-      body.innerHTML = '<div class="inspector-section">' +
-        '<div class="inspector-section-title">Job Data</div>' +
-        '<div class="json-viewer">' + dataHtml + '</div>' +
-      '</div>' +
-      progressHtml +
-      (j.returnvalue !== undefined && j.returnvalue !== null ? (
-        '<div class="inspector-section">' +
-          '<div class="inspector-section-title">Return Value</div>' +
-          '<div class="json-viewer">' + syntaxHighlight(JSON.stringify(j.returnvalue, null, 2)) + '</div>' +
-        '</div>'
-      ) : '') +
-      (j.failedReason ? (
-        '<div class="inspector-section">' +
-          '<div class="inspector-section-title">Failed Reason</div>' +
-          '<div class="json-viewer" style="border-color:rgba(255,77,106,0.3);color:var(--red);">' + escHtml(j.failedReason) + '</div>' +
-        '</div>'
-      ) : '');
+      if (j.failedReason) {
+        html += '<div class="section-label">Failed Reason</div>' +
+          '<div class="json-block" style="border-color:rgba(229,72,77,0.3);color:var(--red);">' + esc(j.failedReason) + '</div>';
+      }
+
+      body.innerHTML = html;
 
     } else if (inspectorTab === 'logs') {
-      const logs = j.logs || [];
+      var logs = j.logs || [];
       if (!logs.length) {
-        body.innerHTML = '<div style="color:var(--text-2);padding:16px;font-family:var(--mono);font-size:12px;">No log entries</div>';
+        body.innerHTML = '<div class="empty-message">No log entries</div>';
       } else {
-        body.innerHTML = '<div class="log-entries">' +
-          logs.map(l => '<div class="log-entry">' + escHtml(l) + '</div>').join('') +
+        body.innerHTML = '<div class="log-list">' +
+          logs.map(function(l, i) {
+            return '<div class="log-line"><span class="log-num">' + (i + 1) + '</span><span class="log-text">' + esc(l) + '</span></div>';
+          }).join('') +
         '</div>';
       }
 
     } else if (inspectorTab === 'details') {
-      const optsHtml = j.opts ? syntaxHighlight(JSON.stringify(j.opts, null, 2)) : '-';
-      body.innerHTML = '<div class="inspector-section">' +
-        '<div class="inspector-section-title">Metadata</div>' +
-        '<dl class="inspector-kv">' +
-          kvRow('ID', j.id) +
-          kvRow('Name', j.name) +
-          kvRow('State', j.state) +
-          kvRow('Attempts', j.attemptsMade || 0) +
-          kvRow('Created', j.timestamp ? formatTimeFull(j.timestamp) : '-') +
-          kvRow('Processed', j.processedOn ? formatTimeFull(j.processedOn) : '-') +
-          kvRow('Finished', j.finishedOn ? formatTimeFull(j.finishedOn) : '-') +
-          (j.parentId ? kvRow('Parent ID', j.parentId) : '') +
-          (j.parentQueue ? kvRow('Parent Q', j.parentQueue) : '') +
-        '</dl>' +
-      '</div>' +
-      '<div class="inspector-section">' +
-        '<div class="inspector-section-title">Options</div>' +
-        '<div class="json-viewer">' + optsHtml + '</div>' +
-      '</div>';
+      body.innerHTML =
+        '<div class="section-label">Details</div>' +
+        '<div class="detail-grid">' +
+          dRow('State', j.state || '-') +
+          dRow('Attempts', j.attemptsMade || 0) +
+          dRow('Created', j.timestamp ? fullTime(j.timestamp) : '-') +
+          dRow('Started', j.processedOn ? fullTime(j.processedOn) : '-') +
+          dRow('Finished', j.finishedOn ? fullTime(j.finishedOn) : '-') +
+          (j.failedReason ? dRow('Failed Reason', j.failedReason, true) : '') +
+        '</div>';
     }
   }
 
-  window.setInspectorTab = function(tab, name) {
+  function dRow(key, val, isFail) {
+    return '<div class="detail-key">' + esc(key) + '</div>' +
+      '<div class="detail-val' + (isFail ? ' fail-reason' : '') + '">' + esc(String(val)) + '</div>';
+  }
+
+  function setInspectorTab(tab, name) {
     inspectorTab = name;
-    document.querySelectorAll('.inspector-tab').forEach(t => t.classList.remove('active'));
+    $('inspector').querySelectorAll('.inspector-tab').forEach(function(t) { t.classList.remove('active'); });
     tab.classList.add('active');
-    renderInspector();
-  };
+    renderInspectorBody();
+  }
 
-  window.closeInspector = function() {
-    selectedJob = null;
-    jobDetail = null;
-    document.getElementById('app').classList.remove('inspector-open');
+  function closeInspector() {
+    inspectedJob = null;
+    inspectedJobData = null;
+    $('inspectorBackdrop').classList.remove('visible');
+    $('inspector').classList.remove('open');
     renderJobs();
-  };
+  }
 
-  // ---- Actions ----
-  window.togglePause = async function() {
+  // -- Actions --
+  async function togglePause() {
     if (!selectedQueue) return;
     try {
       if (isPaused) {
@@ -1495,13 +1519,13 @@
         isPaused = true;
         toast('Queue paused', 'info');
       }
-      updateQueueState();
+      updateStateTag();
     } catch (e) {
       toast('Action failed: ' + e.message, 'error');
     }
-  };
+  }
 
-  window.retryJob = async function(evt, id) {
+  async function retryJob(evt, id) {
     evt.stopPropagation();
     if (!selectedQueue) return;
     try {
@@ -1511,226 +1535,126 @@
     } catch (e) {
       toast('Retry failed', 'error');
     }
-  };
+  }
 
-  window.removeJob = async function(evt, id) {
+  async function removeJob(evt, id) {
     evt.stopPropagation();
     if (!selectedQueue) return;
     try {
       await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/jobs/' + encodeURIComponent(id), { method: 'DELETE' });
       toast('Job ' + id + ' removed', 'success');
-      if (selectedJob === id) closeInspector();
+      if (inspectedJob === String(id)) closeInspector();
       loadJobs();
     } catch (e) {
       toast('Remove failed', 'error');
     }
-  };
+  }
 
-  window.obliterateQueue = function() {
+  function obliterate() {
     if (!selectedQueue) return;
-    showConfirm(
+    confirm(
       'Obliterate Queue',
-      'This will permanently destroy the queue "' + selectedQueue + '" and ALL its jobs. This action cannot be undone.',
+      'This will permanently destroy "' + selectedQueue + '" and all its jobs. This cannot be undone.',
       async function() {
         try {
           await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/obliterate', { method: 'POST' });
           toast('Queue obliterated', 'success');
-          selectedQueue = null;
-          document.getElementById('noQueueState').style.display = '';
-          document.getElementById('queueView').style.display = 'none';
-          closeInspector();
+          deselectQueue();
           loadQueues();
         } catch (e) {
           toast('Obliterate failed', 'error');
         }
       }
     );
-  };
+  }
 
-  // ---- SSE event stream ----
+  // -- Event log --
+  function toggleEvents() {
+    $('bottombar').classList.toggle('collapsed');
+  }
+
+  function clearEvents() {
+    $('eventStream').innerHTML = '';
+    eventCount = 0;
+    $('eventCount').textContent = '0';
+  }
+
+  // -- SSE --
   function connectSSE() {
     if (eventSource) eventSource.close();
     eventSource = new EventSource(BASE + '/api/events');
     eventSource.onmessage = function(e) {
       try {
-        const data = JSON.parse(e.data);
+        var data = JSON.parse(e.data);
         addEvent(data);
-        // Refresh counts if event is for the selected queue
         loadQueues();
-        if (selectedQueue && data.queue === selectedQueue) {
-          loadJobs();
-        }
+        if (selectedQueue && data.queue === selectedQueue) loadJobs();
       } catch (err) {
-        // plain text event
         addEventRaw(e.data);
       }
     };
     eventSource.onerror = function() {
-      // Reconnect after 5s
       setTimeout(connectSSE, 5000);
     };
   }
 
   function addEvent(data) {
-    const stream = document.getElementById('eventStream');
-    const time = formatTimeShort(Date.now());
-    const evtType = data.event || 'unknown';
-    const detail = data.jobId ? 'Job #' + data.jobId : '';
-    const qname = data.queue ? ' [' + data.queue + ']' : '';
-
-    const line = document.createElement('div');
-    line.className = 'event-line';
-    line.innerHTML = '<span class="event-time">' + time + '</span>' +
-      '<span class="event-type evt-' + evtType + '">' + evtType + '</span>' +
-      '<span class="event-detail">' + escHtml(detail + qname + (data.data ? ' - ' + truncate(data.data, 60) : '')) + '</span>';
-
+    var stream = $('eventStream');
+    var evtType = data.event || 'unknown';
+    var line = document.createElement('div');
+    line.className = 'evt';
+    line.innerHTML =
+      '<span class="evt-time">' + shortTime(Date.now()) + '</span>' +
+      '<span class="evt-queue">' + esc(data.queue || '') + '</span>' +
+      '<span class="evt-type t-' + evtType + '">' + evtType + '</span>' +
+      '<span class="evt-job">' + (data.jobId ? '#' + esc(String(data.jobId)) : '') + '</span>';
     stream.appendChild(line);
-    // Keep max 200 events
-    while (stream.children.length > 200) stream.removeChild(stream.firstChild);
+    eventCount++;
+    while (stream.children.length > 200) { stream.removeChild(stream.firstChild); eventCount = 200; }
     stream.scrollTop = stream.scrollHeight;
+    $('eventCount').textContent = String(Math.min(eventCount, 200));
   }
 
   function addEventRaw(text) {
-    const stream = document.getElementById('eventStream');
-    const line = document.createElement('div');
-    line.className = 'event-line';
-    line.innerHTML = '<span class="event-time">' + formatTimeShort(Date.now()) + '</span>' +
-      '<span class="event-detail">' + escHtml(text) + '</span>';
+    var stream = $('eventStream');
+    var line = document.createElement('div');
+    line.className = 'evt';
+    line.innerHTML =
+      '<span class="evt-time">' + shortTime(Date.now()) + '</span>' +
+      '<span class="evt-job">' + esc(text) + '</span>';
     stream.appendChild(line);
+    eventCount++;
+    $('eventCount').textContent = String(Math.min(eventCount, 200));
     stream.scrollTop = stream.scrollHeight;
   }
 
-  window.clearEvents = function() {
-    document.getElementById('eventStream').innerHTML = '';
-  };
-
-  // ---- Confirm dialog ----
-  function showConfirm(title, text, onConfirm) {
-    const overlay = document.createElement('div');
-    overlay.className = 'dialog-overlay';
-    overlay.innerHTML = '<div class="dialog">' +
-      '<div class="dialog-title">' + escHtml(title) + '</div>' +
-      '<div class="dialog-text">' + escHtml(text) + '</div>' +
-      '<div class="dialog-actions">' +
-        '<button class="btn" id="dialogCancel">Cancel</button>' +
-        '<button class="btn btn-danger" id="dialogConfirm">Confirm</button>' +
-      '</div>' +
-    '</div>';
-    document.body.appendChild(overlay);
-
-    overlay.querySelector('#dialogCancel').onclick = function() { overlay.remove(); };
-    overlay.querySelector('#dialogConfirm').onclick = function() { overlay.remove(); onConfirm(); };
-    overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
-  }
-
-  // ---- Toast ----
-  function toast(msg, type) {
-    type = type || 'info';
-    const container = document.getElementById('toastContainer');
-    const el = document.createElement('div');
-    el.className = 'toast toast-' + type;
-    el.textContent = msg;
-    container.appendChild(el);
-    setTimeout(function() { el.remove(); }, 3000);
-  }
-
-  // ---- Event log toggle ----
-  window.toggleEventLog = function() {
-    document.getElementById('bottombar').classList.toggle('collapsed');
-  };
-
-  // ---- Mobile (legacy - kept for compatibility) ----
-  window.toggleSidebar = function() {
-    document.getElementById('sidebar').classList.toggle('mobile-open');
-  };
-
-  // ---- Keyboard shortcuts ----
+  // -- Keyboard --
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      closeInspector();
-      // Also close mobile sidebar
-      document.getElementById('sidebar').classList.remove('mobile-open');
-    }
+    if (e.key === 'Escape') closeInspector();
   });
 
-  // Click outside inspector to close
-  document.getElementById('mainArea').addEventListener('click', function(e) {
-    // Don't close if we clicked a job row (that opens inspector)
-    if (e.target.closest('tr[onclick]')) return;
-    if (e.target.closest('.main-header') || e.target.closest('.filter-bar')) return;
-  });
+  // -- Public API (exposed on window.S for onclick handlers) --
+  window.S = {
+    selectQueue: selectQueue,
+    setFilter: setFilter,
+    inspectJob: inspectJob,
+    setInspectorTab: setInspectorTab,
+    closeInspector: closeInspector,
+    togglePause: togglePause,
+    retryJob: retryJob,
+    removeJob: removeJob,
+    obliterate: obliterate,
+    toggleEvents: toggleEvents,
+    clearEvents: clearEvents
+  };
 
-  // ---- Utility ----
-  function escHtml(s) {
-    if (s === null || s === undefined) return '';
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
-
-  function formatTime(ts) {
-    const d = new Date(typeof ts === 'number' ? ts : parseInt(ts));
-    if (isNaN(d.getTime())) return '-';
-    const now = new Date();
-    const diff = now - d;
-    if (diff < 60000) return Math.floor(diff / 1000) + 's ago';
-    if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
-    if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
-    return d.toLocaleDateString();
-  }
-
-  function formatTimeFull(ts) {
-    const d = new Date(typeof ts === 'number' ? ts : parseInt(ts));
-    if (isNaN(d.getTime())) return '-';
-    return d.toLocaleString();
-  }
-
-  function formatTimeShort(ts) {
-    const d = new Date(ts);
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  }
-
-  function truncate(s, n) {
-    s = String(s);
-    return s.length > n ? s.substring(0, n) + '...' : s;
-  }
-
-  function kvRow(key, val) {
-    return '<dt>' + escHtml(key) + '</dt><dd>' + escHtml(String(val === undefined ? '-' : val)) + '</dd>';
-  }
-
-  function syntaxHighlight(json) {
-    if (!json) return '';
-    json = escHtml(json);
-    return json.replace(
-      /("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
-      function(match) {
-        let cls = 'json-number';
-        if (/^"/.test(match)) {
-          if (/:$/.test(match)) {
-            cls = 'json-key';
-            // Remove trailing colon from the styled part
-            return '<span class="' + cls + '">' + match.slice(0, -1) + '</span>:';
-          } else {
-            cls = 'json-string';
-          }
-        } else if (/true|false/.test(match)) {
-          cls = 'json-boolean';
-        } else if (/null/.test(match)) {
-          cls = 'json-null';
-        }
-        return '<span class="' + cls + '">' + match + '</span>';
-      }
-    );
-  }
-
-  // ---- Init ----
+  // -- Init --
   loadQueues();
   connectSSE();
-
-  // Auto-refresh every 2 seconds
-  refreshInterval = setInterval(function() {
+  setInterval(function() {
     loadQueues();
     if (selectedQueue) loadJobs();
-  }, 2000);
+  }, 3000);
 
 })();
 </script>
