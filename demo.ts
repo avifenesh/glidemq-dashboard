@@ -4,50 +4,52 @@ import { createDashboard } from './src/index';
 
 const connection = { addresses: [{ host: 'localhost', port: 6379 }] };
 
-const payments = new Queue('payments', { connection });
-const emails = new Queue('emails', { connection });
-const reports = new Queue('reports', { connection });
+const fast = new Queue('fast-queue', { connection });
+const slow = new Queue('slow-queue', { connection });
+const flaky = new Queue('flaky-queue', { connection });
 
-// Workers
-const paymentWorker = new Worker('payments', async (job) => {
-  await new Promise(r => setTimeout(r, 200 + Math.random() * 300));
-  if (Math.random() < 0.2) throw new Error('Payment declined');
-  return { txn: 'txn_' + job.id };
-}, { connection, concurrency: 3, blockTimeout: 1000 });
-
-const emailWorker = new Worker('emails', async (job) => {
-  await new Promise(r => setTimeout(r, 50));
-  return { sent: true };
+const fastWorker = new Worker('fast-queue', async (job) => {
+  await new Promise(r => setTimeout(r, 30 + Math.random() * 70));
+  return { processed: job.name, seq: job.data.i };
 }, { connection, concurrency: 5, blockTimeout: 1000 });
 
-const reportWorker = new Worker('reports', async (job) => {
-  await new Promise(r => setTimeout(r, 500));
-  return { rows: Math.floor(Math.random() * 1000) };
+const slowWorker = new Worker('slow-queue', async (job) => {
+  await new Promise(r => setTimeout(r, 400 + Math.random() * 600));
+  return { result: 'done', size: job.data.size };
 }, { connection, concurrency: 1, blockTimeout: 1000 });
 
-paymentWorker.on('error', () => {});
-emailWorker.on('error', () => {});
-reportWorker.on('error', () => {});
+const flakyWorker = new Worker('flaky-queue', async (job) => {
+  await new Promise(r => setTimeout(r, 100 + Math.random() * 200));
+  if (Math.random() < 0.3) throw new Error('Random failure on attempt ' + (job.attemptsMade + 1));
+  return { ok: true };
+}, { connection, concurrency: 3, blockTimeout: 1000 });
 
-// Seed some jobs
+fastWorker.on('error', () => {});
+slowWorker.on('error', () => {});
+flakyWorker.on('error', () => {});
+
 async function seed() {
+  for (let i = 0; i < 30; i++) {
+    await fast.add('task', { i, ts: Date.now() });
+  }
+  for (let i = 0; i < 10; i++) {
+    await slow.add('batch', { size: Math.floor(Math.random() * 1000) }, { delay: i * 1500 });
+  }
   for (let i = 0; i < 20; i++) {
-    await payments.add('charge', { amount: Math.floor(Math.random() * 500), customer: `cust_${i}` }, {
+    await flaky.add('work', { i }, {
       attempts: 3, backoff: { type: 'exponential', delay: 500 },
     });
   }
-  for (let i = 0; i < 30; i++) {
-    await emails.add('welcome', { to: `user${i}@example.com`, template: 'welcome' });
-  }
-  for (let i = 0; i < 5; i++) {
-    await reports.add('daily', { date: '2026-02-15', type: 'revenue' }, { delay: i * 2000 });
-  }
-  console.log('Seeded: 20 payments, 30 emails, 5 delayed reports');
+  console.log('Seeded: 30 fast, 10 slow (delayed), 20 flaky (with retries)');
 }
 
-// Express app
 const app = express();
-app.use('/dashboard', createDashboard([payments, emails, reports]));
+app.use('/dashboard', createDashboard([fast, slow, flaky], {
+  // readOnly: true,               // Uncomment to disable all mutations
+  // authorize: (req, action) => { // Uncomment for custom auth
+  //   return req.headers['x-admin-key'] === 'secret';
+  // },
+}));
 
 app.listen(3000, async () => {
   console.log('Dashboard: http://localhost:3000/dashboard');
