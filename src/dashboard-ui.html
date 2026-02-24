@@ -119,7 +119,6 @@
     letter-spacing: -0.3px;
   }
 
-  /* Queue list: horizontal on mobile, vertical on desktop */
   .queue-nav {
     display: flex;
     gap: 4px;
@@ -142,9 +141,7 @@
     min-width: 0;
   }
 
-  .queue-item:hover {
-    background: var(--bg-2);
-  }
+  .queue-item:hover { background: var(--bg-2); }
 
   .queue-item.active {
     background: var(--bg-3);
@@ -162,11 +159,7 @@
     margin-bottom: 4px;
   }
 
-  .queue-item-counts {
-    display: flex;
-    gap: 6px;
-    flex-wrap: nowrap;
-  }
+  .queue-item-counts { display: flex; gap: 6px; flex-wrap: nowrap; }
 
   .inline-count {
     font-family: var(--mono);
@@ -181,867 +174,207 @@
   /*  MAIN AREA                                                         */
   /* ------------------------------------------------------------------ */
 
-  .main {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    overflow: hidden;
-    min-height: 0;
-  }
+  .main { display: flex; flex-direction: column; flex: 1; overflow: hidden; min-height: 0; }
 
-  /* -- Overview (no queue selected) -- */
-
-  .overview {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px;
-  }
-
+  .overview { flex: 1; overflow-y: auto; padding: 24px; }
   .overview::-webkit-scrollbar { width: 6px; }
   .overview::-webkit-scrollbar-track { background: transparent; }
   .overview::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-  .metric-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 32px;
-    max-width: 560px;
-  }
+  .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 32px; max-width: 560px; }
+  @media (max-width: 500px) { .metric-grid { grid-template-columns: 1fr; } }
 
-  @media (max-width: 500px) {
-    .metric-grid { grid-template-columns: 1fr; }
-  }
-
-  .metric-card {
-    background: var(--bg-1);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 16px;
-  }
-
-  .metric-label {
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-2);
-    margin-bottom: 6px;
-  }
-
-  .metric-value {
-    font-family: var(--mono);
-    font-size: 28px;
-    font-weight: 600;
-    line-height: 1.1;
-  }
-
+  .metric-card { background: var(--bg-1); border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
+  .metric-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-2); margin-bottom: 6px; }
+  .metric-value { font-family: var(--mono); font-size: 28px; font-weight: 600; line-height: 1.1; }
   .metric-value.green { color: var(--green); }
   .metric-value.red { color: var(--red); }
   .metric-value.gray { color: var(--text-1); }
   .metric-value.blue { color: var(--accent); }
 
-  .overview-table-title {
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-2);
-    margin-bottom: 12px;
-  }
+  .overview-table-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-2); margin-bottom: 12px; }
+  .overview-table { width: 100%; border-collapse: collapse; }
+  .overview-table th { font-family: var(--mono); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-2); padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  .overview-table td { font-size: 13px; padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text-0); }
+  .overview-table td.mono { font-family: var(--mono); font-size: 13px; }
+  .overview-table tbody tr { cursor: pointer; transition: background 200ms ease; }
+  .overview-table tbody tr:hover { background: var(--bg-2); }
 
-  .overview-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .overview-table th {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-2);
-    padding: 8px 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .overview-table td {
-    font-size: 13px;
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border);
-    color: var(--text-0);
-  }
-
-  .overview-table td.mono {
-    font-family: var(--mono);
-    font-size: 13px;
-  }
-
-  .overview-table tbody tr {
-    cursor: pointer;
-    transition: background 200ms ease;
-  }
-
-  .overview-table tbody tr:hover {
-    background: var(--bg-2);
-  }
-
-  /* -- Queue view (queue selected) -- */
-
-  .queue-view {
-    display: none;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-  }
-
-  .queue-header {
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-    gap: 12px;
-    flex-wrap: wrap;
-    background: var(--bg-1);
-  }
-
-  .queue-header-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 0;
-  }
-
-  .queue-header-name {
-    font-family: var(--mono);
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-0);
-  }
-
-  .state-tag {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 2px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
+  /* Queue view */
+  .queue-view { display: none; flex-direction: column; flex: 1; min-height: 0; }
+  .queue-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 12px; flex-wrap: wrap; background: var(--bg-1); }
+  .queue-header-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .queue-header-name { font-family: var(--mono); font-size: 14px; font-weight: 600; color: var(--text-0); }
+  .state-tag { font-family: var(--mono); font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
   .state-tag-running { background: rgba(80, 227, 194, 0.1); color: var(--green); }
   .state-tag-paused  { background: rgba(245, 166, 35, 0.1); color: var(--yellow); }
+  .queue-header-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
 
-  .queue-header-actions {
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-  }
+  .btn { font-family: var(--sans); font-size: 13px; font-weight: 500; padding: 6px 14px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-2); color: var(--text-1); cursor: pointer; transition: all 200ms ease; white-space: nowrap; }
+  .btn:hover { background: var(--bg-3); border-color: var(--border-bright); color: var(--text-0); }
+  .btn-danger { border-color: rgba(229, 72, 77, 0.3); color: var(--red); }
+  .btn-danger:hover { background: rgba(229, 72, 77, 0.1); border-color: var(--red); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #005cc5; border-color: #005cc5; color: #fff; }
 
-  .btn {
-    font-family: var(--sans);
-    font-size: 13px;
-    font-weight: 500;
-    padding: 6px 14px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: var(--bg-2);
-    color: var(--text-1);
-    cursor: pointer;
-    transition: all 200ms ease;
-    white-space: nowrap;
-  }
+  /* Panel tabs */
+  .panel-tabs { padding: 0 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0; flex-shrink: 0; background: var(--bg-0); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .panel-tabs::-webkit-scrollbar { height: 0; }
+  .panel-tab { font-size: 13px; font-weight: 500; padding: 10px 14px; color: var(--text-2); cursor: pointer; border-bottom: 2px solid transparent; transition: color 200ms ease, border-color 200ms ease; white-space: nowrap; flex-shrink: 0; user-select: none; }
+  .panel-tab:hover { color: var(--text-1); }
+  .panel-tab.active { color: var(--text-0); border-bottom-color: var(--accent); }
 
-  .btn:hover {
-    background: var(--bg-3);
-    border-color: var(--border-bright);
-    color: var(--text-0);
-  }
-
-  .btn-danger {
-    border-color: rgba(229, 72, 77, 0.3);
-    color: var(--red);
-  }
-
-  .btn-danger:hover {
-    background: rgba(229, 72, 77, 0.1);
-    border-color: var(--red);
-  }
-
-  .btn-primary {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-  }
-
-  .btn-primary:hover {
-    background: #005cc5;
-    border-color: #005cc5;
-    color: #fff;
-  }
-
-  /* -- Filter tabs -- */
-
-  .filter-bar {
-    padding: 0 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 0;
-    flex-shrink: 0;
-    background: var(--bg-1);
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
+  /* Filter tabs */
+  .filter-bar { padding: 0 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0; flex-shrink: 0; background: var(--bg-1); overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .filter-bar::-webkit-scrollbar { height: 0; }
+  .filter-tab { font-size: 13px; font-weight: 500; padding: 10px 14px; color: var(--text-2); cursor: pointer; border-bottom: 2px solid transparent; transition: color 200ms ease, border-color 200ms ease; white-space: nowrap; flex-shrink: 0; user-select: none; }
+  .filter-tab:hover { color: var(--text-1); }
+  .filter-tab.active { color: var(--text-0); border-bottom-color: var(--text-0); }
+  .filter-tab .count { font-family: var(--mono); font-size: 11px; margin-left: 4px; color: var(--text-2); }
 
-  .filter-tab {
-    font-size: 13px;
-    font-weight: 500;
-    padding: 10px 14px;
-    color: var(--text-2);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: color 200ms ease, border-color 200ms ease;
-    white-space: nowrap;
-    flex-shrink: 0;
-    user-select: none;
-  }
+  /* Search bar */
+  .search-bar { padding: 10px 20px; display: flex; gap: 8px; flex-shrink: 0; background: var(--bg-1); border-bottom: 1px solid var(--border); }
+  .search-input { flex: 1; font-family: var(--mono); font-size: 13px; padding: 6px 12px; background: var(--bg-0); border: 1px solid var(--border); border-radius: 4px; color: var(--text-0); outline: none; transition: border-color 200ms ease; }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text-2); }
 
-  .filter-tab:hover {
-    color: var(--text-1);
-  }
-
-  .filter-tab.active {
-    color: var(--text-0);
-    border-bottom-color: var(--text-0);
-  }
-
-  .filter-tab .count {
-    font-family: var(--mono);
-    font-size: 11px;
-    margin-left: 4px;
-    color: var(--text-2);
-  }
-
-  /* -- Job table -- */
-
-  .job-table-wrap {
-    flex: 1;
-    overflow: auto;
-    min-height: 0;
-  }
-
+  /* Job table */
+  .job-table-wrap { flex: 1; overflow: auto; min-height: 0; }
   .job-table-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
   .job-table-wrap::-webkit-scrollbar-track { background: var(--bg-0); }
   .job-table-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-  .job-table {
-    width: 100%;
-    min-width: 520px;
-    border-collapse: collapse;
-  }
-
-  .job-table thead {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-  }
-
-  .job-table th {
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-2);
-    padding: 10px 16px;
-    text-align: left;
-    background: var(--bg-1);
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-
-  .job-table td {
-    padding: 10px 16px;
-    font-size: 13px;
-    vertical-align: middle;
-    color: var(--text-0);
-  }
-
-  .job-table tbody tr {
-    cursor: pointer;
-    transition: background 200ms ease;
-  }
-
-  .job-table tbody tr:hover {
-    background: var(--bg-2);
-  }
-
-  .job-table tbody tr.selected {
-    background: var(--bg-3);
-  }
-
-  .cell-id {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--text-1);
-  }
-
-  .cell-name {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-0);
-  }
-
-  .cell-time {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--text-2);
-    white-space: nowrap;
-  }
-
-  .job-state-badge {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 2px;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    white-space: nowrap;
-  }
-
+  .job-table { width: 100%; min-width: 520px; border-collapse: collapse; }
+  .job-table thead { position: sticky; top: 0; z-index: 2; }
+  .job-table th { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-2); padding: 10px 16px; text-align: left; background: var(--bg-1); border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .job-table td { padding: 10px 16px; font-size: 13px; vertical-align: middle; color: var(--text-0); }
+  .job-table tbody tr { cursor: pointer; transition: background 200ms ease; }
+  .job-table tbody tr:hover { background: var(--bg-2); }
+  .job-table tbody tr.selected { background: var(--bg-3); }
+  .cell-id { font-family: var(--mono); font-size: 13px; color: var(--text-1); }
+  .cell-name { font-size: 13px; font-weight: 500; color: var(--text-0); }
+  .cell-time { font-family: var(--mono); font-size: 12px; color: var(--text-2); white-space: nowrap; }
+  .job-state-badge { font-family: var(--mono); font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
   .jsb-waiting   { background: rgba(161,161,161,0.1);  color: var(--text-1); }
   .jsb-active    { background: rgba(0,112,243,0.1);    color: var(--accent); }
   .jsb-completed { background: rgba(80,227,194,0.1);   color: var(--green); }
   .jsb-failed    { background: rgba(229,72,77,0.1);    color: var(--red); }
   .jsb-delayed   { background: rgba(245,166,35,0.1);   color: var(--yellow); }
+  .action-cell { display: flex; gap: 4px; }
+  .btn-xs { font-size: 12px; font-weight: 500; padding: 4px 10px; border: 1px solid var(--border); border-radius: 4px; background: transparent; color: var(--text-2); cursor: pointer; transition: all 200ms ease; white-space: nowrap; }
+  .btn-xs:hover { border-color: var(--border-bright); color: var(--text-0); background: var(--bg-3); }
+  .empty-message { text-align: center; color: var(--text-2); padding: 48px 16px; font-size: 13px; }
 
-  .action-cell {
-    display: flex;
-    gap: 4px;
-  }
+  /* Panel content */
+  .panel { display: none; flex-direction: column; flex: 1; min-height: 0; overflow: auto; }
+  .panel.active { display: flex; }
+  .panel-content { padding: 20px; flex: 1; overflow-y: auto; }
+  .panel-content::-webkit-scrollbar { width: 6px; }
+  .panel-content::-webkit-scrollbar-track { background: transparent; }
+  .panel-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-  .btn-xs {
-    font-size: 12px;
-    font-weight: 500;
-    padding: 4px 10px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: transparent;
-    color: var(--text-2);
-    cursor: pointer;
-    transition: all 200ms ease;
-    white-space: nowrap;
-  }
-
-  .btn-xs:hover {
-    border-color: var(--border-bright);
-    color: var(--text-0);
-    background: var(--bg-3);
-  }
-
-  .empty-message {
-    text-align: center;
-    color: var(--text-2);
-    padding: 48px 16px;
-    font-size: 13px;
-  }
-
-  /* ------------------------------------------------------------------ */
-  /*  INSPECTOR (slide-over)                                            */
-  /* ------------------------------------------------------------------ */
-
-  .inspector-backdrop {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 100;
-  }
-
-  .inspector-backdrop.visible {
-    display: block;
-  }
-
-  .inspector {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: min(420px, 90vw);
-    background: var(--bg-1);
-    border-left: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    z-index: 101;
-    transform: translateX(100%);
-    transition: transform 200ms ease;
-  }
-
-  .inspector.open {
-    transform: translateX(0);
-  }
-
-  .inspector-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-  }
-
-  .inspector-title {
-    font-family: var(--mono);
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-0);
-  }
-
-  .inspector-close {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: transparent;
-    color: var(--text-2);
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 200ms ease;
-  }
-
-  .inspector-close:hover {
-    background: var(--bg-2);
-    color: var(--text-0);
-    border-color: var(--border-bright);
-  }
-
-  .inspector-tabs {
-    display: flex;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-    padding: 0 20px;
-  }
-
-  .inspector-tab {
-    font-size: 13px;
-    font-weight: 500;
-    padding: 10px 14px;
-    color: var(--text-2);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: color 200ms ease, border-color 200ms ease;
-    user-select: none;
-  }
-
+  /* Inspector */
+  .inspector-backdrop { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 100; }
+  .inspector-backdrop.visible { display: block; }
+  .inspector { position: fixed; top: 0; right: 0; bottom: 0; width: min(420px, 90vw); background: var(--bg-1); border-left: 1px solid var(--border); display: flex; flex-direction: column; z-index: 101; transform: translateX(100%); transition: transform 200ms ease; }
+  .inspector.open { transform: translateX(0); }
+  .inspector-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .inspector-title { font-family: var(--mono); font-size: 14px; font-weight: 600; color: var(--text-0); }
+  .inspector-close { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 4px; background: transparent; color: var(--text-2); cursor: pointer; font-size: 16px; transition: all 200ms ease; }
+  .inspector-close:hover { background: var(--bg-2); color: var(--text-0); border-color: var(--border-bright); }
+  .inspector-tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; padding: 0 20px; }
+  .inspector-tab { font-size: 13px; font-weight: 500; padding: 10px 14px; color: var(--text-2); cursor: pointer; border-bottom: 2px solid transparent; transition: color 200ms ease, border-color 200ms ease; user-select: none; }
   .inspector-tab:hover { color: var(--text-1); }
-
-  .inspector-tab.active {
-    color: var(--text-0);
-    border-bottom-color: var(--text-0);
-  }
-
-  .inspector-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-  }
-
+  .inspector-tab.active { color: var(--text-0); border-bottom-color: var(--text-0); }
+  .inspector-body { flex: 1; overflow-y: auto; padding: 20px; }
   .inspector-body::-webkit-scrollbar { width: 4px; }
   .inspector-body::-webkit-scrollbar-track { background: transparent; }
   .inspector-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  .section-label {
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-2);
-    margin-bottom: 8px;
-  }
-
-  .section-label:not(:first-child) {
-    margin-top: 20px;
-  }
-
-  .json-block {
-    font-family: var(--mono);
-    font-size: 13px;
-    line-height: 1.6;
-    background: var(--bg-0);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 14px;
-    white-space: pre-wrap;
-    word-break: break-all;
-    overflow-x: auto;
-    max-height: 320px;
-    overflow-y: auto;
-  }
-
+  .section-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-2); margin-bottom: 8px; }
+  .section-label:not(:first-child) { margin-top: 20px; }
+  .json-block { font-family: var(--mono); font-size: 13px; line-height: 1.6; background: var(--bg-0); border: 1px solid var(--border); border-radius: 6px; padding: 14px; white-space: pre-wrap; word-break: break-all; overflow-x: auto; max-height: 320px; overflow-y: auto; }
   .json-block::-webkit-scrollbar { width: 4px; }
   .json-block::-webkit-scrollbar-track { background: transparent; }
   .json-block::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  .jk { color: var(--accent); }     /* keys */
-  .js { color: var(--green); }      /* strings */
-  .jn { color: var(--yellow); }     /* numbers */
-  .jb { color: var(--red); }        /* booleans */
-  .jnull { color: var(--text-2); }  /* null */
-
-  .log-list {
-    font-family: var(--mono);
-    font-size: 13px;
-    line-height: 1.8;
-    background: var(--bg-0);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 14px;
-    max-height: 400px;
-    overflow-y: auto;
-  }
-
+  .jk { color: var(--accent); }
+  .js { color: var(--green); }
+  .jn { color: var(--yellow); }
+  .jb { color: var(--red); }
+  .jnull { color: var(--text-2); }
+  .log-list { font-family: var(--mono); font-size: 13px; line-height: 1.8; background: var(--bg-0); border: 1px solid var(--border); border-radius: 6px; padding: 14px; max-height: 400px; overflow-y: auto; }
   .log-list::-webkit-scrollbar { width: 4px; }
   .log-list::-webkit-scrollbar-track { background: transparent; }
   .log-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .log-line { display: flex; gap: 12px; padding: 2px 0; }
+  .log-num { color: var(--text-2); min-width: 24px; text-align: right; user-select: none; flex-shrink: 0; }
+  .log-text { color: var(--text-1); word-break: break-all; }
+  .detail-grid { display: grid; grid-template-columns: 110px 1fr; gap: 8px 16px; font-size: 13px; }
+  .detail-key { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; color: var(--text-2); padding-top: 2px; }
+  .detail-val { font-family: var(--mono); font-size: 13px; color: var(--text-0); word-break: break-all; }
+  .detail-val.fail-reason { color: var(--red); }
 
-  .log-line {
-    display: flex;
-    gap: 12px;
-    padding: 2px 0;
-  }
-
-  .log-num {
-    color: var(--text-2);
-    min-width: 24px;
-    text-align: right;
-    user-select: none;
-    flex-shrink: 0;
-  }
-
-  .log-text {
-    color: var(--text-1);
-    word-break: break-all;
-  }
-
-  .detail-grid {
-    display: grid;
-    grid-template-columns: 110px 1fr;
-    gap: 8px 16px;
-    font-size: 13px;
-  }
-
-  .detail-key {
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    color: var(--text-2);
-    padding-top: 2px;
-  }
-
-  .detail-val {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--text-0);
-    word-break: break-all;
-  }
-
-  .detail-val.fail-reason {
-    color: var(--red);
-  }
-
-  /* ------------------------------------------------------------------ */
-  /*  EVENT LOG (bottom bar)                                            */
-  /* ------------------------------------------------------------------ */
-
-  .bottombar {
-    background: var(--bg-1);
-    border-top: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    max-height: 200px;
-    transition: max-height 200ms ease;
-    overflow: hidden;
-  }
-
-  .bottombar.collapsed {
-    max-height: 36px;
-  }
-
-  .bottombar-header {
-    padding: 8px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-    cursor: pointer;
-    user-select: none;
-    min-height: 36px;
-  }
-
-  .bottombar-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-2);
-  }
-
-  .live-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--green);
-    flex-shrink: 0;
-  }
-
-  .event-count {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text-2);
-  }
-
-  .bottombar-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .btn-clear {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text-2);
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 2px 8px;
-    cursor: pointer;
-    transition: all 200ms ease;
-  }
-
-  .btn-clear:hover {
-    border-color: var(--border-bright);
-    color: var(--text-1);
-  }
-
-  .collapse-arrow {
-    font-size: 12px;
-    color: var(--text-2);
-    transition: transform 200ms ease;
-    line-height: 1;
-  }
-
-  .bottombar.collapsed .collapse-arrow {
-    transform: rotate(180deg);
-  }
-
-  .event-stream {
-    flex: 1;
-    overflow-y: auto;
-    padding: 4px 20px 8px;
-    font-family: var(--mono);
-    font-size: 12px;
-    line-height: 1.7;
-  }
-
+  /* Bottom bar */
+  .bottombar { background: var(--bg-1); border-top: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; max-height: 200px; transition: max-height 200ms ease; overflow: hidden; }
+  .bottombar.collapsed { max-height: 36px; }
+  .bottombar-header { padding: 8px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; cursor: pointer; user-select: none; min-height: 36px; }
+  .bottombar-left { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-2); }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+  .event-count { font-family: var(--mono); font-size: 11px; color: var(--text-2); }
+  .bottombar-right { display: flex; align-items: center; gap: 8px; }
+  .btn-clear { font-size: 11px; font-weight: 500; color: var(--text-2); background: none; border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; cursor: pointer; transition: all 200ms ease; }
+  .btn-clear:hover { border-color: var(--border-bright); color: var(--text-1); }
+  .collapse-arrow { font-size: 12px; color: var(--text-2); transition: transform 200ms ease; line-height: 1; }
+  .bottombar.collapsed .collapse-arrow { transform: rotate(180deg); }
+  .event-stream { flex: 1; overflow-y: auto; padding: 4px 20px 8px; font-family: var(--mono); font-size: 12px; line-height: 1.7; }
   .event-stream::-webkit-scrollbar { width: 4px; }
   .event-stream::-webkit-scrollbar-track { background: transparent; }
   .event-stream::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  .evt {
-    display: flex;
-    gap: 12px;
-    padding: 1px 0;
-  }
-
-  .evt-time {
-    color: var(--text-2);
-    flex-shrink: 0;
-    min-width: 72px;
-    font-size: 12px;
-  }
-
-  .evt-queue {
-    color: var(--text-2);
-    flex-shrink: 0;
-    min-width: 80px;
-    max-width: 120px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 12px;
-  }
-
-  .evt-type {
-    font-weight: 500;
-    flex-shrink: 0;
-    min-width: 80px;
-    font-size: 12px;
-  }
-
+  .evt { display: flex; gap: 12px; padding: 1px 0; }
+  .evt-time { color: var(--text-2); flex-shrink: 0; min-width: 72px; font-size: 12px; }
+  .evt-queue { color: var(--text-2); flex-shrink: 0; min-width: 80px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+  .evt-type { font-weight: 500; flex-shrink: 0; min-width: 80px; font-size: 12px; }
   .evt-type.t-completed { color: var(--green); }
   .evt-type.t-failed    { color: var(--red); }
-  .evt-type.t-added,
-  .evt-type.t-active,
-  .evt-type.t-waiting   { color: var(--accent); }
-  .evt-type.t-retrying,
-  .evt-type.t-delayed   { color: var(--yellow); }
+  .evt-type.t-added, .evt-type.t-active, .evt-type.t-waiting { color: var(--accent); }
+  .evt-type.t-retrying, .evt-type.t-delayed { color: var(--yellow); }
+  .evt-job { color: var(--text-1); font-size: 12px; }
 
-  .evt-job {
-    color: var(--text-1);
-    font-size: 12px;
-  }
-
-  /* ------------------------------------------------------------------ */
-  /*  TOAST                                                             */
-  /* ------------------------------------------------------------------ */
-
-  .toast-container {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    z-index: 10000;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    pointer-events: none;
-  }
-
-  .toast {
-    font-size: 13px;
-    font-weight: 500;
-    padding: 10px 16px;
-    background: var(--bg-3);
-    border: 1px solid var(--border-bright);
-    border-radius: 6px;
-    color: var(--text-0);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    animation: toastIn 200ms ease, toastOut 200ms ease 2.8s forwards;
-    pointer-events: auto;
-  }
-
+  /* Toast */
+  .toast-container { position: fixed; top: 16px; right: 16px; z-index: 10000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+  .toast { font-size: 13px; font-weight: 500; padding: 10px 16px; background: var(--bg-3); border: 1px solid var(--border-bright); border-radius: 6px; color: var(--text-0); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); animation: toastIn 200ms ease, toastOut 200ms ease 2.8s forwards; pointer-events: auto; }
   .toast-success { border-left: 3px solid var(--green); }
   .toast-error   { border-left: 3px solid var(--red); }
   .toast-info    { border-left: 3px solid var(--accent); }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-8px); } }
 
-  @keyframes toastIn {
-    from { opacity: 0; transform: translateY(-8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes toastOut {
-    from { opacity: 1; }
-    to   { opacity: 0; transform: translateY(-8px); }
-  }
-
-  /* ------------------------------------------------------------------ */
-  /*  CONFIRM DIALOG                                                    */
-  /* ------------------------------------------------------------------ */
-
-  .dialog-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10001;
-  }
-
-  .dialog {
-    background: var(--bg-1);
-    border: 1px solid var(--border-bright);
-    border-radius: 6px;
-    padding: 24px;
-    min-width: 320px;
-    max-width: 90vw;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  }
-
-  .dialog-title {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-0);
-    margin-bottom: 8px;
-  }
-
-  .dialog-text {
-    font-size: 13px;
-    color: var(--text-1);
-    margin-bottom: 20px;
-    line-height: 1.6;
-  }
-
-  .dialog-actions {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-  }
+  /* Confirm dialog */
+  .dialog-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 10001; }
+  .dialog { background: var(--bg-1); border: 1px solid var(--border-bright); border-radius: 6px; padding: 24px; min-width: 320px; max-width: 90vw; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); }
+  .dialog-title { font-size: 15px; font-weight: 600; color: var(--text-0); margin-bottom: 8px; }
+  .dialog-text { font-size: 13px; color: var(--text-1); margin-bottom: 20px; line-height: 1.6; }
+  .dialog-actions { display: flex; gap: 8px; justify-content: flex-end; }
 </style>
 </head>
 <body>
 
 <div class="app" id="app">
-  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <div class="logo">glide-mq</div>
-    </div>
+    <div class="sidebar-header"><div class="logo">glide-mq</div></div>
     <div class="queue-nav" id="queueNav"></div>
   </aside>
 
-  <!-- Main -->
   <main class="main" id="main">
-    <!-- Overview: shown when no queue selected -->
     <div class="overview" id="overview">
       <div class="metric-grid" id="metricGrid">
-        <div class="metric-card">
-          <div class="metric-label">Total Processed</div>
-          <div class="metric-value green" id="mCompleted">0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Total Failed</div>
-          <div class="metric-value red" id="mFailed">0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Total Waiting</div>
-          <div class="metric-value gray" id="mWaiting">0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Total Active</div>
-          <div class="metric-value blue" id="mActive">0</div>
-        </div>
+        <div class="metric-card"><div class="metric-label">Total Processed</div><div class="metric-value green" id="mCompleted">0</div></div>
+        <div class="metric-card"><div class="metric-label">Total Failed</div><div class="metric-value red" id="mFailed">0</div></div>
+        <div class="metric-card"><div class="metric-label">Total Waiting</div><div class="metric-value gray" id="mWaiting">0</div></div>
+        <div class="metric-card"><div class="metric-label">Total Active</div><div class="metric-value blue" id="mActive">0</div></div>
       </div>
       <div class="overview-table-title">Queues</div>
-      <table class="overview-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Waiting</th>
-            <th>Active</th>
-            <th>Completed</th>
-            <th>Failed</th>
-          </tr>
-        </thead>
-        <tbody id="overviewBody"></tbody>
-      </table>
+      <table class="overview-table"><thead><tr><th>Name</th><th>Waiting</th><th>Active</th><th>Completed</th><th>Failed</th></tr></thead><tbody id="overviewBody"></tbody></table>
     </div>
 
-    <!-- Queue view: shown when queue selected -->
     <div class="queue-view" id="queueView">
       <div class="queue-header">
         <div class="queue-header-left">
@@ -1050,57 +383,57 @@
         </div>
         <div class="queue-header-actions">
           <button class="btn" id="btnPauseResume" onclick="S.togglePause()">Pause</button>
+          <button class="btn" onclick="S.drainQueue()">Drain</button>
+          <button class="btn" onclick="S.retryAll()">Retry Failed</button>
+          <button class="btn" onclick="S.cleanQueue()">Clean</button>
           <button class="btn btn-danger" onclick="S.obliterate()">Obliterate</button>
         </div>
       </div>
 
-      <div class="filter-bar" id="filterBar">
-        <div class="filter-tab active" data-f="" onclick="S.setFilter(this,'')">All<span class="count" id="fAll"></span></div>
-        <div class="filter-tab" data-f="waiting" onclick="S.setFilter(this,'waiting')">Waiting<span class="count" id="fWaiting"></span></div>
-        <div class="filter-tab" data-f="active" onclick="S.setFilter(this,'active')">Active<span class="count" id="fActive"></span></div>
-        <div class="filter-tab" data-f="delayed" onclick="S.setFilter(this,'delayed')">Delayed<span class="count" id="fDelayed"></span></div>
-        <div class="filter-tab" data-f="completed" onclick="S.setFilter(this,'completed')">Completed<span class="count" id="fCompleted"></span></div>
-        <div class="filter-tab" data-f="failed" onclick="S.setFilter(this,'failed')">Failed<span class="count" id="fFailed"></span></div>
+      <div class="panel-tabs" id="panelTabs">
+        <div class="panel-tab active" onclick="S.setPanel(this,'jobs')">Jobs</div>
+        <div class="panel-tab" onclick="S.setPanel(this,'workers')">Workers</div>
+        <div class="panel-tab" onclick="S.setPanel(this,'schedulers')">Schedulers</div>
+        <div class="panel-tab" onclick="S.setPanel(this,'dlq')">DLQ</div>
+        <div class="panel-tab" onclick="S.setPanel(this,'metrics')">Metrics</div>
       </div>
 
-      <div class="job-table-wrap" id="jobTableWrap">
-        <table class="job-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>State</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="jobBody"></tbody>
-        </table>
+      <div class="panel active" id="panelJobs">
+        <div class="filter-bar" id="filterBar">
+          <div class="filter-tab active" data-f="" onclick="S.setFilter(this,'')">All<span class="count" id="fAll"></span></div>
+          <div class="filter-tab" data-f="waiting" onclick="S.setFilter(this,'waiting')">Waiting<span class="count" id="fWaiting"></span></div>
+          <div class="filter-tab" data-f="active" onclick="S.setFilter(this,'active')">Active<span class="count" id="fActive"></span></div>
+          <div class="filter-tab" data-f="delayed" onclick="S.setFilter(this,'delayed')">Delayed<span class="count" id="fDelayed"></span></div>
+          <div class="filter-tab" data-f="completed" onclick="S.setFilter(this,'completed')">Completed<span class="count" id="fCompleted"></span></div>
+          <div class="filter-tab" data-f="failed" onclick="S.setFilter(this,'failed')">Failed<span class="count" id="fFailed"></span></div>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="searchInput" class="search-input" placeholder="Search by job name..." onkeydown="if(event.key==='Enter')S.searchJobs()">
+          <button class="btn" onclick="S.searchJobs()">Search</button>
+          <button class="btn" onclick="S.clearSearch()">Clear</button>
+        </div>
+        <div class="job-table-wrap" id="jobTableWrap">
+          <table class="job-table"><thead><tr><th>ID</th><th>Name</th><th>State</th><th>Created</th><th>Actions</th></tr></thead><tbody id="jobBody"></tbody></table>
+        </div>
       </div>
+
+      <div class="panel" id="panelWorkers"><div class="panel-content" id="workersContent"><div class="empty-message">Loading workers...</div></div></div>
+      <div class="panel" id="panelSchedulers"><div class="panel-content" id="schedulersContent"><div class="empty-message">Loading schedulers...</div></div></div>
+      <div class="panel" id="panelDlq"><div class="panel-content" id="dlqContent"><div class="empty-message">Loading dead letter queue...</div></div></div>
+      <div class="panel" id="panelMetrics"><div class="panel-content" id="metricsContent"><div class="empty-message">Loading metrics...</div></div></div>
     </div>
   </main>
 
-  <!-- Bottom bar -->
   <div class="bottombar" id="bottombar">
     <div class="bottombar-header" onclick="S.toggleEvents()">
-      <div class="bottombar-left">
-        <span class="live-dot"></span>
-        <span>Events</span>
-        <span class="event-count" id="eventCount">0</span>
-      </div>
-      <div class="bottombar-right">
-        <button class="btn-clear" onclick="S.clearEvents(); event.stopPropagation();">Clear</button>
-        <span class="collapse-arrow" id="collapseArrow">&#9660;</span>
-      </div>
+      <div class="bottombar-left"><span class="live-dot"></span><span>Events</span><span class="event-count" id="eventCount">0</span></div>
+      <div class="bottombar-right"><button class="btn-clear" onclick="S.clearEvents(); event.stopPropagation();">Clear</button><span class="collapse-arrow" id="collapseArrow">&#9660;</span></div>
     </div>
     <div class="event-stream" id="eventStream"></div>
   </div>
 </div>
 
-<!-- Inspector backdrop -->
 <div class="inspector-backdrop" id="inspectorBackdrop" onclick="S.closeInspector()"></div>
-
-<!-- Inspector -->
 <aside class="inspector" id="inspector">
   <div class="inspector-header">
     <div class="inspector-title" id="inspectorTitle">Job #--</div>
@@ -1114,17 +447,20 @@
   <div class="inspector-body" id="inspectorBody"></div>
 </aside>
 
-<!-- Toast container -->
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
+// NOTE: This dashboard uses innerHTML with the esc() function which escapes all HTML entities
+// (&, <, >, ") on every user-facing value. All queue names, job IDs, job data, and error
+// messages are escaped before DOM insertion. This is a deliberate design choice for a
+// single-file vanilla JS dashboard - no external dependencies needed.
 (function() {
   'use strict';
 
-  // -- State --
   var queues = [];
   var selectedQueue = null;
   var currentFilter = '';
+  var currentPanel = 'jobs';
   var jobs = [];
   var inspectedJob = null;
   var inspectedJobData = null;
@@ -1133,13 +469,9 @@
   var eventSource = null;
   var eventCount = 0;
 
-  // -- API base --
   var BASE = window.location.pathname.replace(/\/$/, '');
-
-  // -- DOM refs --
   var $ = function(id) { return document.getElementById(id); };
 
-  // -- Helpers --
   function esc(s) {
     if (s == null) return '';
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1162,34 +494,32 @@
   }
 
   function shortTime(ts) {
-    var d = new Date(ts);
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  function fmtDuration(ms) {
+    if (ms < 1000) return ms + 'ms';
+    if (ms < 60000) return (ms / 1000).toFixed(1) + 's';
+    if (ms < 3600000) return Math.floor(ms / 60000) + 'm ' + Math.floor((ms % 60000) / 1000) + 's';
+    return Math.floor(ms / 3600000) + 'h ' + Math.floor((ms % 3600000) / 60000) + 'm';
   }
 
   function syntaxHL(json) {
     if (!json) return '';
+    if (json.length > 100000) return esc(json.slice(0, 100000) + '\n... (truncated)');
     var s = esc(json);
     return s.replace(
       /("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
       function(m) {
         var c = 'jn';
-        if (/^"/.test(m)) {
-          if (/:$/.test(m)) {
-            c = 'jk';
-            return '<span class="' + c + '">' + m.slice(0, -1) + '</span>:';
-          }
-          c = 'js';
-        } else if (/true|false/.test(m)) {
-          c = 'jb';
-        } else if (/null/.test(m)) {
-          c = 'jnull';
-        }
+        if (/^"/.test(m)) { if (/:$/.test(m)) { c = 'jk'; return '<span class="' + c + '">' + m.slice(0, -1) + '</span>:'; } c = 'js'; }
+        else if (/true|false/.test(m)) { c = 'jb'; }
+        else if (/null/.test(m)) { c = 'jnull'; }
         return '<span class="' + c + '">' + m + '</span>';
       }
     );
   }
 
-  // -- API --
   async function api(path, opts) {
     var res = await fetch(BASE + path, opts);
     if (!res.ok) throw new Error(res.statusText);
@@ -1198,129 +528,165 @@
     return res.text();
   }
 
-  // -- Toast --
   function toast(msg, type) {
-    type = type || 'info';
     var el = document.createElement('div');
-    el.className = 'toast toast-' + type;
+    el.className = 'toast toast-' + (type || 'info');
     el.textContent = msg;
     $('toastContainer').appendChild(el);
     setTimeout(function() { el.remove(); }, 3000);
   }
 
-  // -- Confirm --
   function confirm(title, text, onOk) {
     var ov = document.createElement('div');
     ov.className = 'dialog-overlay';
-    ov.innerHTML =
-      '<div class="dialog">' +
-        '<div class="dialog-title">' + esc(title) + '</div>' +
-        '<div class="dialog-text">' + esc(text) + '</div>' +
-        '<div class="dialog-actions">' +
-          '<button class="btn" id="_dlgCancel">Cancel</button>' +
-          '<button class="btn btn-danger" id="_dlgOk">Confirm</button>' +
-        '</div>' +
-      '</div>';
-    document.body.appendChild(ov);
-    ov.querySelector('#_dlgCancel').onclick = function() { ov.remove(); };
-    ov.querySelector('#_dlgOk').onclick = function() { ov.remove(); onOk(); };
+    var dlg = document.createElement('div');
+    dlg.className = 'dialog';
+    var h = document.createElement('div');
+    h.className = 'dialog-title';
+    h.textContent = title;
+    var p = document.createElement('div');
+    p.className = 'dialog-text';
+    p.textContent = text;
+    var acts = document.createElement('div');
+    acts.className = 'dialog-actions';
+    var btnCancel = document.createElement('button');
+    btnCancel.className = 'btn';
+    btnCancel.textContent = 'Cancel';
+    btnCancel.onclick = function() { ov.remove(); };
+    var btnOk = document.createElement('button');
+    btnOk.className = 'btn btn-danger';
+    btnOk.textContent = 'Confirm';
+    btnOk.onclick = function() { ov.remove(); onOk(); };
+    acts.appendChild(btnCancel);
+    acts.appendChild(btnOk);
+    dlg.appendChild(h);
+    dlg.appendChild(p);
+    dlg.appendChild(acts);
+    ov.appendChild(dlg);
     ov.addEventListener('click', function(e) { if (e.target === ov) ov.remove(); });
+    document.body.appendChild(ov);
   }
 
-  // -- Load queues --
+  // --- Data loading ---
+
   async function loadQueues() {
-    try {
-      var data = await api('/api/queues');
-      queues = Array.isArray(data) ? data : [];
-    } catch (e) {
-      // keep existing
-    }
+    try { var data = await api('/api/queues'); queues = Array.isArray(data) ? data : []; } catch (e) { /* keep existing */ }
     renderSidebar();
     if (!selectedQueue) renderOverview();
     if (selectedQueue) updateFilterCounts();
   }
 
-  // -- Render sidebar --
   function renderSidebar() {
     var nav = $('queueNav');
-    if (!queues.length) {
-      nav.innerHTML = '<div style="padding:24px 12px;color:var(--text-2);font-size:13px;">No queues</div>';
-      return;
-    }
-    nav.innerHTML = queues.map(function(q) {
+    if (!queues.length) { nav.textContent = ''; var msg = document.createElement('div'); msg.style.cssText = 'padding:24px 12px;color:var(--text-2);font-size:13px;'; msg.textContent = 'No queues'; nav.appendChild(msg); return; }
+    var frag = document.createDocumentFragment();
+    queues.forEach(function(q) {
       var name = q.name || q;
       var c = q.counts || {};
-      var active = selectedQueue === name;
-      return '<div class="queue-item' + (active ? ' active' : '') + '" onclick="S.selectQueue(\'' + esc(name) + '\')">' +
-        '<div class="queue-item-name">' + esc(name) + '</div>' +
-        '<div class="queue-item-counts">' +
-          countSpan('W', c.waiting) +
-          countSpan('A', c.active) +
-          countSpan('F', c.failed) +
-        '</div>' +
-      '</div>';
-    }).join('');
+      var div = document.createElement('div');
+      div.className = 'queue-item' + (selectedQueue === name ? ' active' : '');
+      div.onclick = function() { selectQueue(name); };
+      var nameDiv = document.createElement('div');
+      nameDiv.className = 'queue-item-name';
+      nameDiv.textContent = name;
+      var countsDiv = document.createElement('div');
+      countsDiv.className = 'queue-item-counts';
+      countsDiv.appendChild(mkCountSpan('W', c.waiting));
+      countsDiv.appendChild(mkCountSpan('A', c.active));
+      countsDiv.appendChild(mkCountSpan('F', c.failed));
+      div.appendChild(nameDiv);
+      div.appendChild(countsDiv);
+      frag.appendChild(div);
+    });
+    nav.textContent = '';
+    nav.appendChild(frag);
   }
 
-  function countSpan(label, n) {
+  function mkCountSpan(label, n) {
     n = n || 0;
-    return '<span class="inline-count' + (n > 0 ? ' has-value' : '') + '">' + label + ':' + n + '</span>';
+    var span = document.createElement('span');
+    span.className = 'inline-count' + (n > 0 ? ' has-value' : '');
+    span.textContent = label + ':' + n;
+    return span;
   }
 
-  // -- Render overview --
   function renderOverview() {
     var tw = 0, ta = 0, tc = 0, tf = 0;
-    queues.forEach(function(q) {
-      var c = q.counts || {};
-      tw += c.waiting || 0;
-      ta += c.active || 0;
-      tc += c.completed || 0;
-      tf += c.failed || 0;
-    });
+    queues.forEach(function(q) { var c = q.counts || {}; tw += c.waiting || 0; ta += c.active || 0; tc += c.completed || 0; tf += c.failed || 0; });
     $('mCompleted').textContent = tc.toLocaleString();
     $('mFailed').textContent = tf.toLocaleString();
     $('mWaiting').textContent = tw.toLocaleString();
     $('mActive').textContent = ta.toLocaleString();
 
     var tbody = $('overviewBody');
+    tbody.textContent = '';
     if (!queues.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="empty-message">No queues found</td></tr>';
+      var tr = document.createElement('tr');
+      var td = document.createElement('td');
+      td.colSpan = 5;
+      td.className = 'empty-message';
+      td.textContent = 'No queues found';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
       return;
     }
-    tbody.innerHTML = queues.map(function(q) {
+    queues.forEach(function(q) {
       var name = q.name || q;
       var c = q.counts || {};
-      return '<tr onclick="S.selectQueue(\'' + esc(name) + '\')">' +
-        '<td class="mono">' + esc(name) + '</td>' +
-        '<td>' + (c.waiting || 0) + '</td>' +
-        '<td>' + (c.active || 0) + '</td>' +
-        '<td>' + (c.completed || 0) + '</td>' +
-        '<td>' + (c.failed || 0) + '</td>' +
-      '</tr>';
-    }).join('');
+      var tr = document.createElement('tr');
+      tr.onclick = function() { selectQueue(name); };
+      var cells = [name, c.waiting || 0, c.active || 0, c.completed || 0, c.failed || 0];
+      cells.forEach(function(val, i) {
+        var td = document.createElement('td');
+        if (i === 0) td.className = 'mono';
+        td.textContent = String(val);
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
   }
 
-  // -- Select queue --
+  // --- Panel switching ---
+
+  function setPanel(tab, panel) {
+    currentPanel = panel;
+    ['Jobs', 'Workers', 'Schedulers', 'Dlq', 'Metrics'].forEach(function(p) {
+      var el = $('panel' + p);
+      if (el) { if (p.toLowerCase() === panel) el.classList.add('active'); else el.classList.remove('active'); }
+    });
+    $('panelTabs').querySelectorAll('.panel-tab').forEach(function(t) { t.classList.remove('active'); });
+    tab.classList.add('active');
+    if (panel === 'workers') loadWorkers();
+    else if (panel === 'schedulers') loadSchedulers();
+    else if (panel === 'dlq') loadDlq();
+    else if (panel === 'metrics') loadMetrics();
+    else if (panel === 'jobs') loadJobs();
+  }
+
+  // --- Queue selection ---
+
   async function selectQueue(name) {
     selectedQueue = name;
     inspectedJob = null;
     inspectedJobData = null;
     currentFilter = '';
+    currentPanel = 'jobs';
     isPaused = false;
     closeInspector();
-
-    // Reset filter tabs
-    var tabs = $('filterBar').querySelectorAll('.filter-tab');
-    tabs.forEach(function(t) { t.classList.remove('active'); });
-    tabs[0].classList.add('active');
-
-    // Check paused state from queue data
+    $('filterBar').querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
+    $('filterBar').querySelector('.filter-tab').classList.add('active');
+    $('panelTabs').querySelectorAll('.panel-tab').forEach(function(t) { t.classList.remove('active'); });
+    $('panelTabs').querySelector('.panel-tab').classList.add('active');
+    ['Jobs', 'Workers', 'Schedulers', 'Dlq', 'Metrics'].forEach(function(p) {
+      var el = $('panel' + p);
+      if (el) { if (p === 'Jobs') el.classList.add('active'); else el.classList.remove('active'); }
+    });
     var q = queues.find(function(q) { return (q.name || q) === name; });
     if (q && q.paused) isPaused = true;
-
     $('overview').style.display = 'none';
     $('queueView').style.display = 'flex';
     $('queueName').textContent = name;
+    $('searchInput').value = '';
     updateStateTag();
     renderSidebar();
     updateFilterCounts();
@@ -1330,15 +696,8 @@
   function updateStateTag() {
     var tag = $('queueStateTag');
     var btn = $('btnPauseResume');
-    if (isPaused) {
-      tag.textContent = 'PAUSED';
-      tag.className = 'state-tag state-tag-paused';
-      btn.textContent = 'Resume';
-    } else {
-      tag.textContent = 'RUNNING';
-      tag.className = 'state-tag state-tag-running';
-      btn.textContent = 'Pause';
-    }
+    if (isPaused) { tag.textContent = 'PAUSED'; tag.className = 'state-tag state-tag-paused'; btn.textContent = 'Resume'; }
+    else { tag.textContent = 'RUNNING'; tag.className = 'state-tag state-tag-running'; btn.textContent = 'Pause'; }
   }
 
   function deselectQueue() {
@@ -1351,46 +710,83 @@
     renderOverview();
   }
 
-  // -- Load jobs --
+  // --- Jobs ---
+
   async function loadJobs() {
     if (!selectedQueue) return;
-    var params = currentFilter
-      ? '?state=' + currentFilter + '&start=0&end=50'
-      : '?start=0&end=50';
-    try {
-      var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/jobs' + params);
-      jobs = Array.isArray(data) ? data : [];
-    } catch (e) {
-      jobs = [];
-    }
+    var params = currentFilter ? '?state=' + currentFilter + '&start=0&end=50' : '?start=0&end=50';
+    try { var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/jobs' + params); jobs = Array.isArray(data) ? data : []; }
+    catch (e) { jobs = []; }
     renderJobs();
   }
 
   function renderJobs() {
     var tbody = $('jobBody');
+    tbody.textContent = '';
     if (!jobs.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="empty-message">No jobs</td></tr>';
+      var tr = document.createElement('tr');
+      var td = document.createElement('td');
+      td.colSpan = 5;
+      td.className = 'empty-message';
+      td.textContent = 'No jobs';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
       return;
     }
-    tbody.innerHTML = jobs.map(function(j) {
+    var frag = document.createDocumentFragment();
+    jobs.forEach(function(j) {
       var state = j.state || 'waiting';
-      var sel = inspectedJob === String(j.id);
-      var ts = j.timestamp ? relTime(j.timestamp) : '-';
-      var showRetry = state === 'failed';
-      return '<tr class="' + (sel ? 'selected' : '') + '" onclick="S.inspectJob(\'' + esc(String(j.id)) + '\')">' +
-        '<td class="cell-id">' + esc(String(j.id)) + '</td>' +
-        '<td class="cell-name">' + esc(j.name || '-') + '</td>' +
-        '<td><span class="job-state-badge jsb-' + state + '">' + state + '</span></td>' +
-        '<td class="cell-time">' + ts + '</td>' +
-        '<td><div class="action-cell">' +
-          (showRetry ? '<button class="btn-xs" onclick="S.retryJob(event,\'' + esc(String(j.id)) + '\')">Retry</button>' : '') +
-          '<button class="btn-xs" onclick="S.removeJob(event,\'' + esc(String(j.id)) + '\')">Remove</button>' +
-        '</div></td>' +
-      '</tr>';
-    }).join('');
+      var jid = String(j.id);
+      var tr = document.createElement('tr');
+      if (inspectedJob === jid) tr.className = 'selected';
+      tr.onclick = function() { inspectJob(jid); };
+      var tdId = document.createElement('td');
+      tdId.className = 'cell-id';
+      tdId.textContent = jid;
+      var tdName = document.createElement('td');
+      tdName.className = 'cell-name';
+      tdName.textContent = j.name || '-';
+      var tdState = document.createElement('td');
+      var badge = document.createElement('span');
+      badge.className = 'job-state-badge jsb-' + state;
+      badge.textContent = state;
+      tdState.appendChild(badge);
+      var tdTime = document.createElement('td');
+      tdTime.className = 'cell-time';
+      tdTime.textContent = j.timestamp ? relTime(j.timestamp) : '-';
+      var tdActions = document.createElement('td');
+      var actionDiv = document.createElement('div');
+      actionDiv.className = 'action-cell';
+      if (state === 'failed') {
+        var retryBtn = document.createElement('button');
+        retryBtn.className = 'btn-xs';
+        retryBtn.textContent = 'Retry';
+        retryBtn.onclick = function(evt) { retryJob(evt, jid); };
+        actionDiv.appendChild(retryBtn);
+      }
+      if (state === 'delayed') {
+        var promBtn = document.createElement('button');
+        promBtn.className = 'btn-xs';
+        promBtn.textContent = 'Promote';
+        promBtn.onclick = function(evt) { promoteJob(evt, jid); };
+        actionDiv.appendChild(promBtn);
+      }
+      var rmBtn = document.createElement('button');
+      rmBtn.className = 'btn-xs';
+      rmBtn.textContent = 'Remove';
+      rmBtn.onclick = function(evt) { removeJob(evt, jid); };
+      actionDiv.appendChild(rmBtn);
+      tdActions.appendChild(actionDiv);
+      tr.appendChild(tdId);
+      tr.appendChild(tdName);
+      tr.appendChild(tdState);
+      tr.appendChild(tdTime);
+      tr.appendChild(tdActions);
+      frag.appendChild(tr);
+    });
+    tbody.appendChild(frag);
   }
 
-  // -- Filter counts --
   function updateFilterCounts() {
     var q = queues.find(function(q) { return (q.name || q) === selectedQueue; });
     if (!q || !q.counts) return;
@@ -1404,37 +800,175 @@
     setCount('fFailed', c.failed);
   }
 
-  function setCount(id, n) {
-    var el = $(id);
-    if (el) el.textContent = n ? ' ' + n : '';
-  }
+  function setCount(id, n) { var el = $(id); if (el) el.textContent = n ? ' ' + n : ''; }
 
   function setFilter(tab, state) {
     currentFilter = state;
     $('filterBar').querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
     tab.classList.add('active');
+    $('searchInput').value = '';
     loadJobs();
   }
 
-  // -- Inspector --
+  // --- Search ---
+
+  async function searchJobs() {
+    var q = $('searchInput').value.trim();
+    if (!q || !selectedQueue) return;
+    var params = '?name=' + encodeURIComponent(q);
+    if (currentFilter) params += '&state=' + currentFilter;
+    try { var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/search' + params); jobs = Array.isArray(data) ? data : []; renderJobs(); }
+    catch (e) { toast('Search failed', 'error'); }
+  }
+
+  function clearSearch() { $('searchInput').value = ''; loadJobs(); }
+
+  // --- Workers panel ---
+
+  async function loadWorkers() {
+    if (!selectedQueue) return;
+    var el = $('workersContent');
+    try {
+      var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/workers');
+      if (!Array.isArray(data) || !data.length) { el.textContent = ''; var msg = document.createElement('div'); msg.className = 'empty-message'; msg.textContent = 'No active workers'; el.appendChild(msg); return; }
+      el.textContent = '';
+      var table = document.createElement('table');
+      table.className = 'job-table';
+      table.style.minWidth = '400px';
+      var thead = document.createElement('thead');
+      var headRow = document.createElement('tr');
+      ['ID', 'Address', 'PID', 'Started', 'Age', 'Active Jobs'].forEach(function(h) { var th = document.createElement('th'); th.textContent = h; headRow.appendChild(th); });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+      var tbody = document.createElement('tbody');
+      data.forEach(function(w) {
+        var tr = document.createElement('tr');
+        tr.style.cursor = 'default';
+        var vals = [String(w.id || '-'), w.addr || '-', String(w.pid || '-'), w.startedAt ? fullTime(w.startedAt) : '-', w.age != null ? fmtDuration(w.age) : '-', w.activeJobs != null ? String(w.activeJobs) : '-'];
+        vals.forEach(function(v, i) { var td = document.createElement('td'); if (i === 0 || i === 2) td.className = 'cell-id'; else if (i === 3 || i === 4) td.className = 'cell-time'; td.textContent = v; tr.appendChild(td); });
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      el.appendChild(table);
+    } catch (e) { el.textContent = ''; var msg = document.createElement('div'); msg.className = 'empty-message'; msg.textContent = 'Failed to load workers'; el.appendChild(msg); }
+  }
+
+  // --- Schedulers panel ---
+
+  async function loadSchedulers() {
+    if (!selectedQueue) return;
+    var el = $('schedulersContent');
+    try {
+      var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/schedulers');
+      if (!Array.isArray(data) || !data.length) { el.textContent = ''; var msg = document.createElement('div'); msg.className = 'empty-message'; msg.textContent = 'No job schedulers'; el.appendChild(msg); return; }
+      el.textContent = '';
+      var table = document.createElement('table');
+      table.className = 'job-table';
+      table.style.minWidth = '400px';
+      var thead = document.createElement('thead');
+      var headRow = document.createElement('tr');
+      ['Name', 'Pattern / Interval', 'Next Run', 'Template'].forEach(function(h) { var th = document.createElement('th'); th.textContent = h; headRow.appendChild(th); });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+      var tbody = document.createElement('tbody');
+      data.forEach(function(s) {
+        var entry = s.entry || {};
+        var pattern = entry.pattern || (entry.every ? 'every ' + fmtDuration(entry.every) : '-');
+        var tmpl = entry.template ? (entry.template.name || '-') : '-';
+        var tr = document.createElement('tr');
+        tr.style.cursor = 'default';
+        var vals = [s.name, pattern, entry.nextRun ? fullTime(entry.nextRun) : '-', tmpl];
+        vals.forEach(function(v, i) { var td = document.createElement('td'); if (i === 0) td.className = 'cell-name'; else if (i === 1) td.className = 'cell-id'; else if (i === 2) td.className = 'cell-time'; td.textContent = v; tr.appendChild(td); });
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      el.appendChild(table);
+    } catch (e) { el.textContent = ''; var msg = document.createElement('div'); msg.className = 'empty-message'; msg.textContent = 'Failed to load schedulers'; el.appendChild(msg); }
+  }
+
+  // --- DLQ panel ---
+
+  async function loadDlq() {
+    if (!selectedQueue) return;
+    var el = $('dlqContent');
+    try {
+      var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/dlq?start=0&end=50');
+      if (!Array.isArray(data) || !data.length) { el.textContent = ''; var msg = document.createElement('div'); msg.className = 'empty-message'; msg.textContent = 'No dead letter jobs'; el.appendChild(msg); return; }
+      el.textContent = '';
+      var table = document.createElement('table');
+      table.className = 'job-table';
+      table.style.minWidth = '400px';
+      var thead = document.createElement('thead');
+      var headRow = document.createElement('tr');
+      ['ID', 'Name', 'Failed Reason', 'Created'].forEach(function(h) { var th = document.createElement('th'); th.textContent = h; headRow.appendChild(th); });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+      var tbody = document.createElement('tbody');
+      data.forEach(function(j) {
+        var jid = String(j.id);
+        var tr = document.createElement('tr');
+        tr.style.cursor = 'pointer';
+        tr.onclick = function() { inspectJob(jid); };
+        var tdId = document.createElement('td'); tdId.className = 'cell-id'; tdId.textContent = jid;
+        var tdName = document.createElement('td'); tdName.className = 'cell-name'; tdName.textContent = j.name || '-';
+        var tdFail = document.createElement('td'); tdFail.style.cssText = 'color:var(--red);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'; tdFail.textContent = j.failedReason || '-';
+        var tdTime = document.createElement('td'); tdTime.className = 'cell-time'; tdTime.textContent = j.timestamp ? relTime(j.timestamp) : '-';
+        tr.appendChild(tdId); tr.appendChild(tdName); tr.appendChild(tdFail); tr.appendChild(tdTime);
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      el.appendChild(table);
+    } catch (e) { el.textContent = ''; var msg = document.createElement('div'); msg.className = 'empty-message'; msg.textContent = 'Failed to load dead letter queue'; el.appendChild(msg); }
+  }
+
+  // --- Metrics panel ---
+
+  async function loadMetrics() {
+    if (!selectedQueue) return;
+    var el = $('metricsContent');
+    try {
+      var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/metrics');
+      el.textContent = '';
+      var grid = document.createElement('div');
+      grid.className = 'metric-grid';
+      grid.style.maxWidth = '400px';
+      [['Completed', data.completed, 'green'], ['Failed', data.failed, 'red']].forEach(function(m) {
+        var card = document.createElement('div');
+        card.className = 'metric-card';
+        var label = document.createElement('div');
+        label.className = 'metric-label';
+        label.textContent = m[0];
+        var value = document.createElement('div');
+        value.className = 'metric-value ' + m[2];
+        value.textContent = (m[1] != null ? Number(m[1]) : 0).toLocaleString();
+        card.appendChild(label);
+        card.appendChild(value);
+        grid.appendChild(card);
+      });
+      el.appendChild(grid);
+    } catch (e) { el.textContent = ''; var msg = document.createElement('div'); msg.className = 'empty-message'; msg.textContent = 'Failed to load metrics'; el.appendChild(msg); }
+  }
+
+  // --- Inspector ---
+
   async function inspectJob(id) {
     inspectedJob = String(id);
     inspectorTab = 'data';
     renderJobs();
-
     $('inspectorBackdrop').classList.add('visible');
     $('inspector').classList.add('open');
     $('inspectorTitle').textContent = 'Job #' + id;
-
-    // Reset tabs
     $('inspector').querySelectorAll('.inspector-tab').forEach(function(t) { t.classList.remove('active'); });
     $('inspector').querySelector('.inspector-tab').classList.add('active');
-
     try {
       inspectedJobData = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/job/' + encodeURIComponent(id));
       renderInspectorBody();
     } catch (e) {
-      $('inspectorBody').innerHTML = '<div class="empty-message">Failed to load job details</div>';
+      $('inspectorBody').textContent = '';
+      var msg = document.createElement('div');
+      msg.className = 'empty-message';
+      msg.textContent = 'Failed to load job details';
+      $('inspectorBody').appendChild(msg);
     }
   }
 
@@ -1442,53 +976,82 @@
     if (!inspectedJobData) return;
     var j = inspectedJobData;
     var body = $('inspectorBody');
+    body.textContent = '';
 
     if (inspectorTab === 'data') {
-      var dataStr = j.data ? syntaxHL(JSON.stringify(j.data, null, 2)) : '<span class="jnull">null</span>';
-      var html = '<div class="section-label">Job Data</div>' +
-        '<div class="json-block">' + dataStr + '</div>';
-
+      addSectionLabel(body, 'Job Data');
+      var dataBlock = document.createElement('div');
+      dataBlock.className = 'json-block';
+      if (j.data) { dataBlock.innerHTML = syntaxHL(JSON.stringify(j.data, null, 2)); }
+      else { var sp = document.createElement('span'); sp.className = 'jnull'; sp.textContent = 'null'; dataBlock.appendChild(sp); }
+      body.appendChild(dataBlock);
       if (j.returnvalue != null) {
-        html += '<div class="section-label">Return Value</div>' +
-          '<div class="json-block">' + syntaxHL(JSON.stringify(j.returnvalue, null, 2)) + '</div>';
+        addSectionLabel(body, 'Return Value');
+        var rvBlock = document.createElement('div');
+        rvBlock.className = 'json-block';
+        rvBlock.innerHTML = syntaxHL(JSON.stringify(j.returnvalue, null, 2));
+        body.appendChild(rvBlock);
       }
-
       if (j.failedReason) {
-        html += '<div class="section-label">Failed Reason</div>' +
-          '<div class="json-block" style="border-color:rgba(229,72,77,0.3);color:var(--red);">' + esc(j.failedReason) + '</div>';
+        addSectionLabel(body, 'Failed Reason');
+        var frBlock = document.createElement('div');
+        frBlock.className = 'json-block';
+        frBlock.style.borderColor = 'rgba(229,72,77,0.3)';
+        frBlock.style.color = 'var(--red)';
+        frBlock.textContent = j.failedReason;
+        body.appendChild(frBlock);
       }
-
-      body.innerHTML = html;
-
     } else if (inspectorTab === 'logs') {
       var logs = j.logs || [];
-      if (!logs.length) {
-        body.innerHTML = '<div class="empty-message">No log entries</div>';
-      } else {
-        body.innerHTML = '<div class="log-list">' +
-          logs.map(function(l, i) {
-            return '<div class="log-line"><span class="log-num">' + (i + 1) + '</span><span class="log-text">' + esc(l) + '</span></div>';
-          }).join('') +
-        '</div>';
+      if (!logs.length) { var msg = document.createElement('div'); msg.className = 'empty-message'; msg.textContent = 'No log entries'; body.appendChild(msg); }
+      else {
+        var list = document.createElement('div');
+        list.className = 'log-list';
+        logs.forEach(function(l, i) {
+          var line = document.createElement('div');
+          line.className = 'log-line';
+          var num = document.createElement('span');
+          num.className = 'log-num';
+          num.textContent = String(i + 1);
+          var txt = document.createElement('span');
+          txt.className = 'log-text';
+          txt.textContent = l;
+          line.appendChild(num);
+          line.appendChild(txt);
+          list.appendChild(line);
+        });
+        body.appendChild(list);
       }
-
     } else if (inspectorTab === 'details') {
-      body.innerHTML =
-        '<div class="section-label">Details</div>' +
-        '<div class="detail-grid">' +
-          dRow('State', j.state || '-') +
-          dRow('Attempts', j.attemptsMade || 0) +
-          dRow('Created', j.timestamp ? fullTime(j.timestamp) : '-') +
-          dRow('Started', j.processedOn ? fullTime(j.processedOn) : '-') +
-          dRow('Finished', j.finishedOn ? fullTime(j.finishedOn) : '-') +
-          (j.failedReason ? dRow('Failed Reason', j.failedReason, true) : '') +
-        '</div>';
+      addSectionLabel(body, 'Details');
+      var grid = document.createElement('div');
+      grid.className = 'detail-grid';
+      addDetailRow(grid, 'State', j.state || '-');
+      addDetailRow(grid, 'Attempts', String(j.attemptsMade || 0));
+      addDetailRow(grid, 'Created', j.timestamp ? fullTime(j.timestamp) : '-');
+      addDetailRow(grid, 'Started', j.processedOn ? fullTime(j.processedOn) : '-');
+      addDetailRow(grid, 'Finished', j.finishedOn ? fullTime(j.finishedOn) : '-');
+      if (j.failedReason) addDetailRow(grid, 'Failed Reason', j.failedReason, true);
+      body.appendChild(grid);
     }
   }
 
-  function dRow(key, val, isFail) {
-    return '<div class="detail-key">' + esc(key) + '</div>' +
-      '<div class="detail-val' + (isFail ? ' fail-reason' : '') + '">' + esc(String(val)) + '</div>';
+  function addSectionLabel(parent, text) {
+    var lbl = document.createElement('div');
+    lbl.className = 'section-label';
+    lbl.textContent = text;
+    parent.appendChild(lbl);
+  }
+
+  function addDetailRow(grid, key, val, isFail) {
+    var k = document.createElement('div');
+    k.className = 'detail-key';
+    k.textContent = key;
+    var v = document.createElement('div');
+    v.className = 'detail-val' + (isFail ? ' fail-reason' : '');
+    v.textContent = val;
+    grid.appendChild(k);
+    grid.appendChild(v);
   }
 
   function setInspectorTab(tab, name) {
@@ -1506,96 +1069,93 @@
     renderJobs();
   }
 
-  // -- Actions --
+  // --- Queue actions ---
+
   async function togglePause() {
     if (!selectedQueue) return;
     try {
-      if (isPaused) {
-        await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/resume', { method: 'POST' });
-        isPaused = false;
-        toast('Queue resumed', 'success');
-      } else {
-        await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/pause', { method: 'POST' });
-        isPaused = true;
-        toast('Queue paused', 'info');
-      }
+      if (isPaused) { await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/resume', { method: 'POST' }); isPaused = false; toast('Queue resumed', 'success'); }
+      else { await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/pause', { method: 'POST' }); isPaused = true; toast('Queue paused', 'info'); }
       updateStateTag();
-    } catch (e) {
-      toast('Action failed: ' + e.message, 'error');
-    }
+    } catch (e) { toast('Action failed: ' + e.message, 'error'); }
   }
 
   async function retryJob(evt, id) {
     evt.stopPropagation();
     if (!selectedQueue) return;
-    try {
-      await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/jobs/' + encodeURIComponent(id) + '/retry', { method: 'POST' });
-      toast('Job ' + id + ' retried', 'success');
-      loadJobs();
-    } catch (e) {
-      toast('Retry failed', 'error');
-    }
+    try { await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/jobs/' + encodeURIComponent(id) + '/retry', { method: 'POST' }); toast('Job ' + id + ' retried', 'success'); loadJobs(); }
+    catch (e) { toast('Retry failed', 'error'); }
   }
 
   async function removeJob(evt, id) {
     evt.stopPropagation();
     if (!selectedQueue) return;
-    try {
-      await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/jobs/' + encodeURIComponent(id), { method: 'DELETE' });
-      toast('Job ' + id + ' removed', 'success');
-      if (inspectedJob === String(id)) closeInspector();
-      loadJobs();
-    } catch (e) {
-      toast('Remove failed', 'error');
-    }
+    try { await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/jobs/' + encodeURIComponent(id), { method: 'DELETE' }); toast('Job ' + id + ' removed', 'success'); if (inspectedJob === String(id)) closeInspector(); loadJobs(); }
+    catch (e) { toast('Remove failed', 'error'); }
+  }
+
+  async function promoteJob(evt, id) {
+    evt.stopPropagation();
+    if (!selectedQueue) return;
+    try { await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/jobs/' + encodeURIComponent(id) + '/promote', { method: 'POST' }); toast('Job ' + id + ' promoted', 'success'); loadJobs(); }
+    catch (e) { toast('Promote failed', 'error'); }
   }
 
   function obliterate() {
     if (!selectedQueue) return;
-    confirm(
-      'Obliterate Queue',
-      'This will permanently destroy "' + selectedQueue + '" and all its jobs. This cannot be undone.',
-      async function() {
-        try {
-          await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/obliterate', { method: 'POST' });
-          toast('Queue obliterated', 'success');
-          deselectQueue();
-          loadQueues();
-        } catch (e) {
-          toast('Obliterate failed', 'error');
-        }
-      }
-    );
+    confirm('Obliterate Queue', 'This will permanently destroy "' + selectedQueue + '" and all its jobs. This cannot be undone.', async function() {
+      try { await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/obliterate', { method: 'POST' }); toast('Queue obliterated', 'success'); deselectQueue(); loadQueues(); }
+      catch (e) { toast('Obliterate failed', 'error'); }
+    });
   }
 
-  // -- Event log --
-  function toggleEvents() {
-    $('bottombar').classList.toggle('collapsed');
+  function drainQueue() {
+    if (!selectedQueue) return;
+    confirm('Drain Queue', 'Remove all waiting jobs from "' + selectedQueue + '"?', async function() {
+      try { await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/drain', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ delayed: false }) }); toast('Queue drained', 'success'); loadQueues(); loadJobs(); }
+      catch (e) { toast('Drain failed: ' + e.message, 'error'); }
+    });
   }
 
-  function clearEvents() {
-    $('eventStream').innerHTML = '';
-    eventCount = 0;
-    $('eventCount').textContent = '0';
+  function retryAll() {
+    if (!selectedQueue) return;
+    confirm('Retry All Failed', 'Retry all failed jobs in "' + selectedQueue + '"?', async function() {
+      try { var result = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/retry-all', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }); toast((result.retried || 0) + ' jobs retried', 'success'); loadQueues(); loadJobs(); }
+      catch (e) { toast('Retry failed: ' + e.message, 'error'); }
+    });
   }
 
-  // -- SSE --
+  function cleanQueue() {
+    if (!selectedQueue) return;
+    confirm('Clean Old Jobs', 'Remove completed jobs older than 1 hour from "' + selectedQueue + '"?', async function() {
+      try { var result = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/clean', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ grace: 3600000, limit: 1000, type: 'completed' }) }); toast((result.removed || 0) + ' jobs cleaned', 'success'); loadQueues(); loadJobs(); }
+      catch (e) { toast('Clean failed: ' + e.message, 'error'); }
+    });
+  }
+
+  // --- Events ---
+
+  function toggleEvents() { $('bottombar').classList.toggle('collapsed'); }
+  function clearEvents() { $('eventStream').textContent = ''; eventCount = 0; $('eventCount').textContent = '0'; }
+
+  var refreshTimer = null;
+  function scheduleRefresh() {
+    if (refreshTimer) return;
+    refreshTimer = setTimeout(function() {
+      refreshTimer = null;
+      loadQueues();
+      if (selectedQueue && currentPanel === 'jobs') loadJobs();
+    }, 1000);
+  }
+
   function connectSSE() {
     if (eventSource) eventSource.close();
     eventSource = new EventSource(BASE + '/api/events');
     eventSource.onmessage = function(e) {
-      try {
-        var data = JSON.parse(e.data);
-        addEvent(data);
-        loadQueues();
-        if (selectedQueue && data.queue === selectedQueue) loadJobs();
-      } catch (err) {
-        addEventRaw(e.data);
-      }
+      try { var data = JSON.parse(e.data); addEvent(data); scheduleRefresh(); }
+      catch (err) { addEventRaw(e.data); }
     };
-    eventSource.onerror = function() {
-      setTimeout(connectSSE, 5000);
-    };
+    eventSource.onerror = function() { setTimeout(connectSSE, 5000); };
   }
 
   function addEvent(data) {
@@ -1603,11 +1163,22 @@
     var evtType = data.event || 'unknown';
     var line = document.createElement('div');
     line.className = 'evt';
-    line.innerHTML =
-      '<span class="evt-time">' + shortTime(Date.now()) + '</span>' +
-      '<span class="evt-queue">' + esc(data.queue || '') + '</span>' +
-      '<span class="evt-type t-' + evtType + '">' + evtType + '</span>' +
-      '<span class="evt-job">' + (data.jobId ? '#' + esc(String(data.jobId)) : '') + '</span>';
+    var time = document.createElement('span');
+    time.className = 'evt-time';
+    time.textContent = shortTime(Date.now());
+    var queue = document.createElement('span');
+    queue.className = 'evt-queue';
+    queue.textContent = data.queue || '';
+    var type = document.createElement('span');
+    type.className = 'evt-type t-' + evtType;
+    type.textContent = evtType;
+    var job = document.createElement('span');
+    job.className = 'evt-job';
+    job.textContent = data.jobId ? '#' + data.jobId : '';
+    line.appendChild(time);
+    line.appendChild(queue);
+    line.appendChild(type);
+    line.appendChild(job);
     stream.appendChild(line);
     eventCount++;
     while (stream.children.length > 200) { stream.removeChild(stream.firstChild); eventCount = 200; }
@@ -1619,43 +1190,34 @@
     var stream = $('eventStream');
     var line = document.createElement('div');
     line.className = 'evt';
-    line.innerHTML =
-      '<span class="evt-time">' + shortTime(Date.now()) + '</span>' +
-      '<span class="evt-job">' + esc(text) + '</span>';
+    var time = document.createElement('span');
+    time.className = 'evt-time';
+    time.textContent = shortTime(Date.now());
+    var job = document.createElement('span');
+    job.className = 'evt-job';
+    job.textContent = text;
+    line.appendChild(time);
+    line.appendChild(job);
     stream.appendChild(line);
     eventCount++;
     $('eventCount').textContent = String(Math.min(eventCount, 200));
     stream.scrollTop = stream.scrollHeight;
   }
 
-  // -- Keyboard --
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeInspector();
-  });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeInspector(); });
 
-  // -- Public API (exposed on window.S for onclick handlers) --
   window.S = {
-    selectQueue: selectQueue,
-    setFilter: setFilter,
-    inspectJob: inspectJob,
-    setInspectorTab: setInspectorTab,
-    closeInspector: closeInspector,
-    togglePause: togglePause,
-    retryJob: retryJob,
-    removeJob: removeJob,
-    obliterate: obliterate,
-    toggleEvents: toggleEvents,
-    clearEvents: clearEvents
+    selectQueue: selectQueue, setPanel: setPanel, setFilter: setFilter,
+    searchJobs: searchJobs, clearSearch: clearSearch,
+    inspectJob: inspectJob, setInspectorTab: setInspectorTab, closeInspector: closeInspector,
+    togglePause: togglePause, retryJob: retryJob, removeJob: removeJob, promoteJob: promoteJob,
+    obliterate: obliterate, drainQueue: drainQueue, retryAll: retryAll, cleanQueue: cleanQueue,
+    toggleEvents: toggleEvents, clearEvents: clearEvents
   };
 
-  // -- Init --
   loadQueues();
   connectSSE();
-  setInterval(function() {
-    loadQueues();
-    if (selectedQueue) loadJobs();
-  }, 3000);
-
+  setInterval(function() { loadQueues(); if (selectedQueue && currentPanel === 'jobs') loadJobs(); }, 3000);
 })();
 </script>
 </body>
