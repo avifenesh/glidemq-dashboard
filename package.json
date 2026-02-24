@@ -1,12 +1,19 @@
 {
   "name": "@glidemq/dashboard",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Web dashboard for glide-mq queue monitoring and management",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist"
+    "build": "tsc && node scripts/copy-assets.js",
+    "test": "vitest run",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -14,15 +21,18 @@
   },
   "license": "Apache-2.0",
   "peerDependencies": {
-    "glide-mq": ">=0.3.0",
+    "glide-mq": ">=0.8.0",
     "express": "^4 || ^5"
   },
   "devDependencies": {
-    "glide-mq": "^0.3.0",
+    "glide-mq": "file:../glide-mq",
     "express": "^5",
     "@types/express": "^5",
     "@types/node": "^22",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3",
+    "supertest": "^7",
+    "@types/supertest": "^6"
   },
   "keywords": [
     "glide-mq",
