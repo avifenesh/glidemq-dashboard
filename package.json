@@ -25,7 +25,7 @@
     "express": "^4 || ^5"
   },
   "devDependencies": {
-    "glide-mq": "file:../glide-mq",
+    "glide-mq": "^0.8.0",
     "express": "^5",
     "@types/express": "^5",
     "@types/node": "^22",
