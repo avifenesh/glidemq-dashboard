@@ -1,6 +1,20 @@
 # @glidemq/dashboard
 
+[![npm](https://img.shields.io/npm/v/@glidemq/dashboard)](https://www.npmjs.com/package/@glidemq/dashboard)
+[![CI](https://github.com/avifenesh/glidemq-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/avifenesh/glidemq-dashboard/actions)
+[![license](https://img.shields.io/npm/l/@glidemq/dashboard)](https://github.com/avifenesh/glidemq-dashboard/blob/main/LICENSE)
+
 Web dashboard for monitoring and managing [glide-mq](https://github.com/avifenesh/glide-mq) queues. Express middleware that serves a real-time UI and REST API.
+
+Drop-in Express middleware - one function call gives you a full queue monitoring UI with real-time SSE updates, job inspection, bulk actions, and per-queue authorization. Zero frontend build step, zero external dependencies.
+
+Part of the **glide-mq** ecosystem:
+
+| Package | Purpose |
+|---------|---------|
+| [glide-mq](https://github.com/avifenesh/glide-mq) | Core queue library - producers, workers, schedulers, workflows |
+| [@glidemq/hono](https://github.com/avifenesh/glidemq-hono) | Hono REST API + SSE middleware |
+| **@glidemq/dashboard** | Express web UI for monitoring and managing queues (you are here) |
 
 ## Installation
 
@@ -99,11 +113,13 @@ app.use('/dashboard', createDashboard(queues, {
 - Job schedulers view
 - Dead letter queue panel
 - Throughput metrics
-- Job search by name
+- Job search by name, state, and data
 - Bulk actions: drain, retry all, clean
 - Per-job actions: retry, remove, promote
+- Authorization with per-action granularity
 - Dark theme, responsive layout
 - Express 4 and 5 compatible
+- Self-contained - no frontend build, no external CDN
 
 ## License
 
