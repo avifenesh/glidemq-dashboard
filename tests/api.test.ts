@@ -269,8 +269,8 @@ describe('GET /api/queues/:name/metrics', () => {
     const app = makeApp([q]);
     const res = await request(app).get('/dash/api/queues/q/metrics');
     expect(res.status).toBe(200);
-    expect(res.body.completed).toBe(100);
-    expect(res.body.failed).toBe(5);
+    expect(res.body.completed.count).toBe(100);
+    expect(res.body.failed.count).toBe(5);
   });
 });
 

@@ -36,7 +36,7 @@ function safeError(res: Response, err: unknown, status = 500): void {
 }
 
 function serializeJob(j: Job): Record<string, unknown> {
-  return {
+  const result: Record<string, unknown> = {
     id: j.id,
     name: j.name,
     data: j.data,
@@ -49,12 +49,20 @@ function serializeJob(j: Job): Record<string, unknown> {
     processedOn: j.processedOn,
     finishedOn: j.finishedOn,
   };
+  if ((j as any).parentId != null) result.parentId = (j as any).parentId;
+  if ((j as any).parentQueue != null) result.parentQueue = (j as any).parentQueue;
+  if ((j as any).orderingKey != null) result.orderingKey = (j as any).orderingKey;
+  if ((j as any).cost != null) result.cost = (j as any).cost;
+  if ((j as any).schedulerName != null) result.schedulerName = (j as any).schedulerName;
+  return result;
 }
 
 type ActionString =
   | 'queue:pause' | 'queue:resume' | 'queue:obliterate'
   | 'queue:drain' | 'queue:retryAll' | 'queue:clean'
-  | 'job:remove' | 'job:retry' | 'job:promote';
+  | 'job:remove' | 'job:retry' | 'job:promote'
+  | 'job:changePriority' | 'job:changeDelay'
+  | 'scheduler:upsert' | 'scheduler:remove';
 
 async function guardMutation(
   req: Request,
@@ -146,15 +154,22 @@ export function createDashboard(
     const end = parseInt(req.query.end as string, 10);
     const endVal = isNaN(end) ? 20 : Math.min(end, start + MAX_PAGE_SIZE);
 
+    const excludeData = req.query.excludeData === 'true';
+    const getJobsOpts = excludeData ? { excludeData: true } : undefined;
+
     try {
       if (state) {
-        const jobs = await queue.getJobs(state as JobState, start, endVal);
+        const jobs = getJobsOpts
+          ? await queue.getJobs(state as JobState, start, endVal, getJobsOpts)
+          : await queue.getJobs(state as JobState, start, endVal);
         res.json(jobs.map((j) => ({ ...serializeJob(j), state })));
       } else {
         const tagged: Record<string, unknown>[] = [];
         await Promise.all(
           VALID_STATES.map(async (s) => {
-            const jobs = await queue.getJobs(s, 0, endVal);
+            const jobs = getJobsOpts
+              ? await queue.getJobs(s, 0, endVal, getJobsOpts)
+              : await queue.getJobs(s, 0, endVal);
             for (const j of jobs) tagged.push({ ...serializeJob(j), state: s });
           }),
         );
@@ -249,7 +264,10 @@ export function createDashboard(
         queue.getMetrics('completed'),
         queue.getMetrics('failed'),
       ]);
-      res.json({ completed: completed.count, failed: failed.count });
+      res.json({
+        completed: { count: completed.count, data: completed.data ?? [] },
+        failed: { count: failed.count, data: failed.data ?? [] },
+      });
     } catch (err) {
       safeError(res, err);
     }
@@ -459,6 +477,102 @@ export function createDashboard(
     try {
       const removed = await queue.clean(grace, Math.min(limit, 1000), type);
       res.json({ status: 'ok', removed: removed.length });
+    } catch (err) {
+      safeError(res, err);
+    }
+  });
+
+  // --- Change job priority ---
+  router.post('/api/queues/:name/jobs/:id/priority', async (req: Request, res: Response) => {
+    if (!(await guardMutation(req, res, opts, 'job:changePriority'))) return;
+    const queue = queueMap.get(param(req, 'name'));
+    if (!queue) {
+      res.status(404).json({ error: 'Queue not found' });
+      return;
+    }
+    const jobId = param(req, 'id');
+    const priority = parseInt(req.body?.priority, 10);
+    if (isNaN(priority) || priority < 0) {
+      res.status(400).json({ error: 'priority must be a non-negative integer' });
+      return;
+    }
+    try {
+      const job = await queue.getJob(jobId);
+      if (!job) {
+        res.status(404).json({ error: 'Job not found' });
+        return;
+      }
+      await job.changePriority(priority);
+      res.json({ status: 'ok' });
+    } catch (err) {
+      safeError(res, err);
+    }
+  });
+
+  // --- Change job delay ---
+  router.post('/api/queues/:name/jobs/:id/delay', async (req: Request, res: Response) => {
+    if (!(await guardMutation(req, res, opts, 'job:changeDelay'))) return;
+    const queue = queueMap.get(param(req, 'name'));
+    if (!queue) {
+      res.status(404).json({ error: 'Queue not found' });
+      return;
+    }
+    const jobId = param(req, 'id');
+    const delay = parseInt(req.body?.delay, 10);
+    if (isNaN(delay) || delay < 0) {
+      res.status(400).json({ error: 'delay must be a non-negative integer (ms)' });
+      return;
+    }
+    try {
+      const job = await queue.getJob(jobId);
+      if (!job) {
+        res.status(404).json({ error: 'Job not found' });
+        return;
+      }
+      await job.changeDelay(delay);
+      res.json({ status: 'ok' });
+    } catch (err) {
+      safeError(res, err);
+    }
+  });
+
+  // --- Create/upsert scheduler ---
+  router.post('/api/queues/:name/schedulers', async (req: Request, res: Response) => {
+    if (!(await guardMutation(req, res, opts, 'scheduler:upsert'))) return;
+    const queue = queueMap.get(param(req, 'name'));
+    if (!queue) {
+      res.status(404).json({ error: 'Queue not found' });
+      return;
+    }
+    const { name: schedulerName, schedule, template } = req.body ?? {};
+    if (!schedulerName || typeof schedulerName !== 'string') {
+      res.status(400).json({ error: 'name is required and must be a string' });
+      return;
+    }
+    if (!schedule || typeof schedule !== 'object') {
+      res.status(400).json({ error: 'schedule is required and must be an object' });
+      return;
+    }
+    try {
+      await queue.upsertJobScheduler(schedulerName, schedule, template);
+      res.json({ status: 'ok' });
+    } catch (err) {
+      safeError(res, err);
+    }
+  });
+
+  // --- Remove scheduler ---
+  router.delete('/api/queues/:name/schedulers/:schedulerName', async (req: Request, res: Response) => {
+    if (!(await guardMutation(req, res, opts, 'scheduler:remove'))) return;
+    const queue = queueMap.get(param(req, 'name'));
+    if (!queue) {
+      res.status(404).json({ error: 'Queue not found' });
+      return;
+    }
+    const schedulerName = param(req, 'schedulerName');
+    try {
+      await queue.removeJobScheduler(schedulerName);
+      res.json({ status: 'removed' });
     } catch (err) {
       safeError(res, err);
     }

@@ -353,6 +353,57 @@
   .dialog-title { font-size: 15px; font-weight: 600; color: var(--text-0); margin-bottom: 8px; }
   .dialog-text { font-size: 13px; color: var(--text-1); margin-bottom: 20px; line-height: 1.6; }
   .dialog-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* Metrics chart */
+  .metrics-section { margin-bottom: 24px; }
+  .metrics-section-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-2); margin-bottom: 12px; }
+  .metrics-chart { display: flex; align-items: flex-end; gap: 2px; height: 120px; padding: 0; background: var(--bg-0); border: 1px solid var(--border); border-radius: 6px; padding: 12px 8px 24px; position: relative; overflow-x: auto; }
+  .metrics-chart::-webkit-scrollbar { height: 4px; }
+  .metrics-chart::-webkit-scrollbar-track { background: transparent; }
+  .metrics-chart::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .metrics-bar { flex: 1; min-width: 6px; max-width: 14px; border-radius: 2px 2px 0 0; transition: height 200ms ease; position: relative; cursor: default; }
+  .metrics-bar.bar-green { background: var(--green); opacity: 0.8; }
+  .metrics-bar.bar-red { background: var(--red); opacity: 0.8; }
+  .metrics-bar:hover { opacity: 1; }
+  .metrics-bar-tooltip { display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: var(--bg-3); border: 1px solid var(--border-bright); border-radius: 4px; padding: 4px 8px; font-family: var(--mono); font-size: 11px; color: var(--text-0); white-space: nowrap; z-index: 10; pointer-events: none; margin-bottom: 4px; }
+  .metrics-bar:hover .metrics-bar-tooltip { display: block; }
+  .metrics-chart-label { position: absolute; bottom: 4px; left: 8px; right: 8px; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--text-2); }
+  .metrics-summary { display: flex; gap: 16px; margin-bottom: 8px; }
+  .metrics-summary-item { font-family: var(--mono); font-size: 13px; }
+  .metrics-summary-item .ms-label { font-size: 11px; color: var(--text-2); text-transform: uppercase; margin-right: 6px; }
+  .metrics-summary-item .ms-val-green { color: var(--green); font-weight: 600; }
+  .metrics-summary-item .ms-val-red { color: var(--red); font-weight: 600; }
+  .metrics-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  .metrics-table th { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-2); padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+  .metrics-table td { font-family: var(--mono); font-size: 12px; padding: 4px 10px; border-bottom: 1px solid var(--border); color: var(--text-1); }
+
+  /* Scheduler form */
+  .scheduler-form { background: var(--bg-0); border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin-bottom: 16px; }
+  .scheduler-form-title { font-size: 13px; font-weight: 600; color: var(--text-0); margin-bottom: 12px; }
+  .form-row { display: flex; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .form-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px; }
+  .form-group.full-width { flex-basis: 100%; }
+  .form-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; color: var(--text-2); }
+  .form-input { font-family: var(--mono); font-size: 13px; padding: 6px 10px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 4px; color: var(--text-0); outline: none; transition: border-color 200ms ease; }
+  .form-input:focus { border-color: var(--accent); }
+  .form-input::placeholder { color: var(--text-2); }
+  .form-textarea { font-family: var(--mono); font-size: 13px; padding: 8px 10px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 4px; color: var(--text-0); outline: none; transition: border-color 200ms ease; resize: vertical; min-height: 60px; }
+  .form-textarea:focus { border-color: var(--accent); }
+  .form-textarea::placeholder { color: var(--text-2); }
+  .form-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+  /* Inspector mutation buttons */
+  .inspector-action-group { margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .inline-input-group { display: flex; gap: 6px; align-items: center; margin-top: 8px; }
+  .inline-input { font-family: var(--mono); font-size: 13px; padding: 4px 8px; background: var(--bg-0); border: 1px solid var(--border); border-radius: 4px; color: var(--text-0); outline: none; width: 120px; }
+  .inline-input:focus { border-color: var(--accent); }
+
+  /* Detail badges */
+  .detail-badge { display: inline-block; font-family: var(--mono); font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .badge-lifo { background: rgba(245,166,35,0.15); color: var(--yellow); }
+  .badge-custom-id { background: rgba(0,112,243,0.15); color: var(--accent); }
+  .detail-link { color: var(--accent); text-decoration: none; cursor: pointer; }
+  .detail-link:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -418,7 +469,7 @@
       </div>
 
       <div class="panel" id="panelWorkers"><div class="panel-content" id="workersContent"><div class="empty-message">Loading workers...</div></div></div>
-      <div class="panel" id="panelSchedulers"><div class="panel-content" id="schedulersContent"><div class="empty-message">Loading schedulers...</div></div></div>
+      <div class="panel" id="panelSchedulers"><div class="panel-content" id="schedulersContent"><div class="empty-message">Loading schedulers...</div></div><div id="schedulerFormContainer"></div></div>
       <div class="panel" id="panelDlq"><div class="panel-content" id="dlqContent"><div class="empty-message">Loading dead letter queue...</div></div></div>
       <div class="panel" id="panelMetrics"><div class="panel-content" id="metricsContent"><div class="empty-message">Loading metrics...</div></div></div>
     </div>
@@ -855,30 +906,196 @@
 
   // --- Schedulers panel ---
 
+  var schedulerFormVisible = false;
+
+  function toggleSchedulerForm() {
+    schedulerFormVisible = !schedulerFormVisible;
+    renderSchedulerForm();
+  }
+
+  function renderSchedulerForm() {
+    var container = $('schedulerFormContainer');
+    if (!container) return;
+    container.textContent = '';
+    if (!schedulerFormVisible) return;
+
+    var form = document.createElement('div');
+    form.className = 'scheduler-form';
+    var title = document.createElement('div');
+    title.className = 'scheduler-form-title';
+    title.textContent = 'Add Scheduler';
+    form.appendChild(title);
+
+    // Row 1: name + timezone
+    var row1 = document.createElement('div');
+    row1.className = 'form-row';
+    var gName = mkFormGroup('Name *', 'text', 'sched-name', 'my-scheduler');
+    var gTz = mkFormGroup('Timezone', 'text', 'sched-tz', 'UTC');
+    row1.appendChild(gName);
+    row1.appendChild(gTz);
+    form.appendChild(row1);
+
+    // Row 2: pattern OR every OR repeatAfterComplete
+    var row2 = document.createElement('div');
+    row2.className = 'form-row';
+    var gPattern = mkFormGroup('Cron Pattern', 'text', 'sched-pattern', '*/5 * * * *');
+    var gEvery = mkFormGroup('Every (ms)', 'number', 'sched-every', '60000');
+    var gRepeat = mkFormGroup('Repeat After Complete (ms)', 'number', 'sched-repeat', '30000');
+    row2.appendChild(gPattern);
+    row2.appendChild(gEvery);
+    row2.appendChild(gRepeat);
+    form.appendChild(row2);
+
+    // Row 3: template name
+    var row3 = document.createElement('div');
+    row3.className = 'form-row';
+    var gTmplName = mkFormGroup('Template Job Name', 'text', 'sched-tmpl-name', 'my-job');
+    row3.appendChild(gTmplName);
+    form.appendChild(row3);
+
+    // Row 4: template data (JSON)
+    var row4 = document.createElement('div');
+    row4.className = 'form-row';
+    var gData = document.createElement('div');
+    gData.className = 'form-group full-width';
+    var lbl = document.createElement('div');
+    lbl.className = 'form-label';
+    lbl.textContent = 'Template Data (JSON)';
+    var ta = document.createElement('textarea');
+    ta.className = 'form-textarea';
+    ta.id = 'sched-tmpl-data';
+    ta.placeholder = '{"key": "value"}';
+    gData.appendChild(lbl);
+    gData.appendChild(ta);
+    row4.appendChild(gData);
+    form.appendChild(row4);
+
+    // Actions
+    var acts = document.createElement('div');
+    acts.className = 'form-actions';
+    var btnSubmit = document.createElement('button');
+    btnSubmit.className = 'btn btn-primary';
+    btnSubmit.textContent = 'Create Scheduler';
+    btnSubmit.onclick = function() { submitSchedulerForm(); };
+    var btnCancel = document.createElement('button');
+    btnCancel.className = 'btn';
+    btnCancel.textContent = 'Cancel';
+    btnCancel.onclick = function() { schedulerFormVisible = false; renderSchedulerForm(); };
+    acts.appendChild(btnSubmit);
+    acts.appendChild(btnCancel);
+    form.appendChild(acts);
+
+    container.appendChild(form);
+  }
+
+  function mkFormGroup(label, type, id, placeholder) {
+    var g = document.createElement('div');
+    g.className = 'form-group';
+    var lbl = document.createElement('div');
+    lbl.className = 'form-label';
+    lbl.textContent = label;
+    var inp = document.createElement('input');
+    inp.className = 'form-input';
+    inp.type = type;
+    inp.id = id;
+    inp.placeholder = placeholder || '';
+    g.appendChild(lbl);
+    g.appendChild(inp);
+    return g;
+  }
+
+  async function submitSchedulerForm() {
+    if (!selectedQueue) return;
+    var name = ($('sched-name') || {}).value;
+    if (!name || !name.trim()) { toast('Scheduler name is required', 'error'); return; }
+    var pattern = ($('sched-pattern') || {}).value;
+    var every = ($('sched-every') || {}).value;
+    var repeatAfterComplete = ($('sched-repeat') || {}).value;
+    var tz = ($('sched-tz') || {}).value;
+    var tmplName = ($('sched-tmpl-name') || {}).value;
+    var tmplDataStr = ($('sched-tmpl-data') || {}).value;
+
+    var schedule = {};
+    if (pattern && pattern.trim()) schedule.pattern = pattern.trim();
+    else if (every && parseInt(every, 10) > 0) schedule.every = parseInt(every, 10);
+    else if (repeatAfterComplete && parseInt(repeatAfterComplete, 10) > 0) schedule.repeatAfterComplete = parseInt(repeatAfterComplete, 10);
+    else { toast('Provide a cron pattern, interval, or repeat-after-complete value', 'error'); return; }
+    if (tz && tz.trim()) schedule.tz = tz.trim();
+
+    var body = { name: name.trim(), schedule: schedule };
+    if (tmplName && tmplName.trim()) {
+      body.template = { name: tmplName.trim() };
+      if (tmplDataStr && tmplDataStr.trim()) {
+        try { body.template.data = JSON.parse(tmplDataStr); }
+        catch (e) { toast('Invalid JSON in template data', 'error'); return; }
+      }
+    }
+
+    try {
+      await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/schedulers', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      });
+      toast('Scheduler created', 'success');
+      schedulerFormVisible = false;
+      renderSchedulerForm();
+      loadSchedulers();
+    } catch (e) { toast('Failed to create scheduler: ' + e.message, 'error'); }
+  }
+
+  async function deleteScheduler(name) {
+    confirm('Delete Scheduler', 'Remove scheduler "' + name + '" from "' + selectedQueue + '"? This cannot be undone.', async function() {
+      try {
+        await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/schedulers/' + encodeURIComponent(name), { method: 'DELETE' });
+        toast('Scheduler removed', 'success');
+        loadSchedulers();
+      } catch (e) { toast('Failed to remove scheduler: ' + e.message, 'error'); }
+    });
+  }
+
   async function loadSchedulers() {
     if (!selectedQueue) return;
     var el = $('schedulersContent');
     try {
       var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/schedulers');
-      if (!Array.isArray(data) || !data.length) { el.textContent = ''; var msg = document.createElement('div'); msg.className = 'empty-message'; msg.textContent = 'No job schedulers'; el.appendChild(msg); return; }
       el.textContent = '';
+
+      // Add Scheduler button
+      var btnRow = document.createElement('div');
+      btnRow.style.cssText = 'margin-bottom:12px;display:flex;gap:8px;';
+      var addBtn = document.createElement('button');
+      addBtn.className = 'btn btn-primary';
+      addBtn.textContent = 'Add Scheduler';
+      addBtn.onclick = function() { toggleSchedulerForm(); };
+      btnRow.appendChild(addBtn);
+      el.appendChild(btnRow);
+
+      if (!Array.isArray(data) || !data.length) { var msg = document.createElement('div'); msg.className = 'empty-message'; msg.textContent = 'No job schedulers'; el.appendChild(msg); return; }
       var table = document.createElement('table');
       table.className = 'job-table';
       table.style.minWidth = '400px';
       var thead = document.createElement('thead');
       var headRow = document.createElement('tr');
-      ['Name', 'Pattern / Interval', 'Next Run', 'Template'].forEach(function(h) { var th = document.createElement('th'); th.textContent = h; headRow.appendChild(th); });
+      ['Name', 'Pattern / Interval', 'Next Run', 'Template', 'Actions'].forEach(function(h) { var th = document.createElement('th'); th.textContent = h; headRow.appendChild(th); });
       thead.appendChild(headRow);
       table.appendChild(thead);
       var tbody = document.createElement('tbody');
       data.forEach(function(s) {
         var entry = s.entry || {};
-        var pattern = entry.pattern || (entry.every ? 'every ' + fmtDuration(entry.every) : '-');
+        var pattern = entry.pattern || (entry.every ? 'every ' + fmtDuration(entry.every) : (entry.repeatAfterComplete ? 'after ' + fmtDuration(entry.repeatAfterComplete) : '-'));
         var tmpl = entry.template ? (entry.template.name || '-') : '-';
         var tr = document.createElement('tr');
         tr.style.cursor = 'default';
-        var vals = [s.name, pattern, entry.nextRun ? fullTime(entry.nextRun) : '-', tmpl];
-        vals.forEach(function(v, i) { var td = document.createElement('td'); if (i === 0) td.className = 'cell-name'; else if (i === 1) td.className = 'cell-id'; else if (i === 2) td.className = 'cell-time'; td.textContent = v; tr.appendChild(td); });
+        var tdName = document.createElement('td'); tdName.className = 'cell-name'; tdName.textContent = s.name;
+        var tdPattern = document.createElement('td'); tdPattern.className = 'cell-id'; tdPattern.textContent = pattern;
+        var tdNext = document.createElement('td'); tdNext.className = 'cell-time'; tdNext.textContent = entry.nextRun ? fullTime(entry.nextRun) : '-';
+        var tdTmpl = document.createElement('td'); tdTmpl.textContent = tmpl;
+        var tdActions = document.createElement('td');
+        var delBtn = document.createElement('button');
+        delBtn.className = 'btn-xs btn-danger';
+        delBtn.textContent = 'Delete';
+        delBtn.onclick = (function(schedulerName) { return function() { deleteScheduler(schedulerName); }; })(s.name);
+        tdActions.appendChild(delBtn);
+        tr.appendChild(tdName); tr.appendChild(tdPattern); tr.appendChild(tdNext); tr.appendChild(tdTmpl); tr.appendChild(tdActions);
         tbody.appendChild(tr);
       });
       table.appendChild(tbody);
@@ -923,29 +1140,128 @@
 
   // --- Metrics panel ---
 
+  function buildBarChart(parentEl, dataPoints, color, label) {
+    var section = document.createElement('div');
+    section.className = 'metrics-section';
+    var title = document.createElement('div');
+    title.className = 'metrics-section-title';
+    title.textContent = label;
+    section.appendChild(title);
+
+    if (!dataPoints || !dataPoints.length) {
+      var msg = document.createElement('div');
+      msg.style.cssText = 'color:var(--text-2);font-size:13px;padding:8px 0;';
+      msg.textContent = 'No time-series data available';
+      section.appendChild(msg);
+      parentEl.appendChild(section);
+      return;
+    }
+
+    // Take last 60 data points (minutes)
+    var points = dataPoints.slice(-60);
+    var maxCount = 1;
+    points.forEach(function(p) { if (p.count > maxCount) maxCount = p.count; });
+
+    var chartWrap = document.createElement('div');
+    chartWrap.style.position = 'relative';
+    var chart = document.createElement('div');
+    chart.className = 'metrics-chart';
+
+    points.forEach(function(p) {
+      var bar = document.createElement('div');
+      bar.className = 'metrics-bar bar-' + color;
+      var h = Math.max(2, Math.round((p.count / maxCount) * 90));
+      bar.style.height = h + '%';
+      var tip = document.createElement('div');
+      tip.className = 'metrics-bar-tooltip';
+      var tipTime = p.timestamp ? new Date(p.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
+      tip.textContent = tipTime + ' | count: ' + p.count + (p.avgDuration != null ? ' | avg: ' + fmtDuration(p.avgDuration) : '');
+      bar.appendChild(tip);
+      chart.appendChild(bar);
+    });
+
+    chartWrap.appendChild(chart);
+
+    // Time labels
+    if (points.length > 1) {
+      var labels = document.createElement('div');
+      labels.className = 'metrics-chart-label';
+      var first = document.createElement('span');
+      first.textContent = points[0].timestamp ? new Date(points[0].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+      var last = document.createElement('span');
+      last.textContent = points[points.length - 1].timestamp ? new Date(points[points.length - 1].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+      labels.appendChild(first);
+      labels.appendChild(last);
+      chartWrap.appendChild(labels);
+    }
+
+    section.appendChild(chartWrap);
+
+    // Data table (most recent first, limited to 20 rows)
+    if (points.length > 0) {
+      var table = document.createElement('table');
+      table.className = 'metrics-table';
+      var thead = document.createElement('thead');
+      var headRow = document.createElement('tr');
+      ['Time', 'Count', 'Avg Duration'].forEach(function(h) { var th = document.createElement('th'); th.textContent = h; headRow.appendChild(th); });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+      var tbody = document.createElement('tbody');
+      var tablePoints = points.slice().reverse().slice(0, 20);
+      tablePoints.forEach(function(p) {
+        var tr = document.createElement('tr');
+        tr.style.cursor = 'default';
+        var tdTime = document.createElement('td');
+        tdTime.textContent = p.timestamp ? new Date(p.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
+        var tdCount = document.createElement('td');
+        tdCount.textContent = String(p.count);
+        var tdDur = document.createElement('td');
+        tdDur.textContent = p.avgDuration != null ? fmtDuration(p.avgDuration) : '-';
+        tr.appendChild(tdTime);
+        tr.appendChild(tdCount);
+        tr.appendChild(tdDur);
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      section.appendChild(table);
+    }
+
+    parentEl.appendChild(section);
+  }
+
   async function loadMetrics() {
     if (!selectedQueue) return;
     var el = $('metricsContent');
     try {
       var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/metrics');
       el.textContent = '';
+
+      // Summary cards
       var grid = document.createElement('div');
       grid.className = 'metric-grid';
       grid.style.maxWidth = '400px';
-      [['Completed', data.completed, 'green'], ['Failed', data.failed, 'red']].forEach(function(m) {
+      var compCount = (data.completed && data.completed.count != null) ? data.completed.count : 0;
+      var failCount = (data.failed && data.failed.count != null) ? data.failed.count : 0;
+      [['Completed', compCount, 'green'], ['Failed', failCount, 'red']].forEach(function(m) {
         var card = document.createElement('div');
         card.className = 'metric-card';
-        var label = document.createElement('div');
-        label.className = 'metric-label';
-        label.textContent = m[0];
+        var lbl = document.createElement('div');
+        lbl.className = 'metric-label';
+        lbl.textContent = m[0];
         var value = document.createElement('div');
         value.className = 'metric-value ' + m[2];
         value.textContent = (m[1] != null ? Number(m[1]) : 0).toLocaleString();
-        card.appendChild(label);
+        card.appendChild(lbl);
         card.appendChild(value);
         grid.appendChild(card);
       });
       el.appendChild(grid);
+
+      // Time-series charts
+      var compData = (data.completed && data.completed.data) || [];
+      var failData = (data.failed && data.failed.data) || [];
+      buildBarChart(el, compData, 'green', 'Completed (last 60 minutes)');
+      buildBarChart(el, failData, 'red', 'Failed (last 60 minutes)');
     } catch (e) { el.textContent = ''; var msg = document.createElement('div'); msg.className = 'empty-message'; msg.textContent = 'Failed to load metrics'; el.appendChild(msg); }
   }
 
@@ -1032,7 +1348,124 @@
       addDetailRow(grid, 'Started', j.processedOn ? fullTime(j.processedOn) : '-');
       addDetailRow(grid, 'Finished', j.finishedOn ? fullTime(j.finishedOn) : '-');
       if (j.failedReason) addDetailRow(grid, 'Failed Reason', j.failedReason, true);
+
+      // Parent info
+      if (j.parentId) {
+        var parentK = document.createElement('div');
+        parentK.className = 'detail-key';
+        parentK.textContent = 'Parent';
+        var parentV = document.createElement('div');
+        parentV.className = 'detail-val';
+        var parentLabel = (j.parentQueue ? j.parentQueue + '/' : '') + j.parentId;
+        var parentLink = document.createElement('a');
+        parentLink.className = 'detail-link';
+        parentLink.textContent = parentLabel;
+        parentLink.href = '#';
+        parentLink.onclick = function(e) {
+          e.preventDefault();
+          if (j.parentQueue) {
+            var pq = queues.find(function(q) { return (q.name || q) === j.parentQueue; });
+            if (pq) { selectQueue(j.parentQueue).then(function() { inspectJob(j.parentId); }); return; }
+          }
+          inspectJob(j.parentId);
+        };
+        parentV.appendChild(parentLink);
+        grid.appendChild(parentK);
+        grid.appendChild(parentV);
+      }
+
+      // Ordering key
+      if (j.orderingKey) addDetailRow(grid, 'Ordering Key', j.orderingKey);
+
+      // Cost
+      if (j.cost != null) addDetailRow(grid, 'Cost', String(j.cost));
+
+      // Scheduler name
+      if (j.schedulerName) addDetailRow(grid, 'Scheduler', j.schedulerName);
+
       body.appendChild(grid);
+
+      // Badges
+      var badgeWrap = document.createElement('div');
+      badgeWrap.style.cssText = 'margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;';
+      if (j.opts && j.opts.lifo === true) {
+        var lifoBadge = document.createElement('span');
+        lifoBadge.className = 'detail-badge badge-lifo';
+        lifoBadge.textContent = 'LIFO';
+        badgeWrap.appendChild(lifoBadge);
+      }
+      if (j.opts && j.opts.jobId && j.opts.jobId !== j.id) {
+        var cidBadge = document.createElement('span');
+        cidBadge.className = 'detail-badge badge-custom-id';
+        cidBadge.textContent = 'Custom ID: ' + esc(String(j.opts.jobId));
+        badgeWrap.appendChild(cidBadge);
+      }
+      if (badgeWrap.children.length > 0) body.appendChild(badgeWrap);
+
+      // Mutation buttons for appropriate states
+      var jobState = j.state || '';
+      if (jobState === 'waiting' || jobState === 'delayed') {
+        addSectionLabel(body, 'Actions');
+        var actionGroup = document.createElement('div');
+        actionGroup.className = 'inspector-action-group';
+
+        // Change Priority (waiting/delayed)
+        var priBtn = document.createElement('button');
+        priBtn.className = 'btn';
+        priBtn.textContent = 'Change Priority';
+        priBtn.onclick = function() {
+          var existing = document.getElementById('priority-input-group');
+          if (existing) { existing.remove(); return; }
+          var ig = document.createElement('div');
+          ig.className = 'inline-input-group';
+          ig.id = 'priority-input-group';
+          var inp = document.createElement('input');
+          inp.className = 'inline-input';
+          inp.type = 'number';
+          inp.min = '0';
+          inp.placeholder = 'Priority';
+          inp.value = (j.opts && j.opts.priority != null) ? String(j.opts.priority) : '0';
+          var go = document.createElement('button');
+          go.className = 'btn btn-primary';
+          go.textContent = 'Apply';
+          go.style.fontSize = '12px';
+          go.style.padding = '4px 10px';
+          go.onclick = function() { changePriority(j.id, inp.value); };
+          ig.appendChild(inp);
+          ig.appendChild(go);
+          actionGroup.parentNode.insertBefore(ig, actionGroup.nextSibling);
+        };
+        actionGroup.appendChild(priBtn);
+
+        // Change Delay (waiting/delayed)
+        var delBtn = document.createElement('button');
+        delBtn.className = 'btn';
+        delBtn.textContent = 'Change Delay';
+        delBtn.onclick = function() {
+          var existing = document.getElementById('delay-input-group');
+          if (existing) { existing.remove(); return; }
+          var ig = document.createElement('div');
+          ig.className = 'inline-input-group';
+          ig.id = 'delay-input-group';
+          var inp = document.createElement('input');
+          inp.className = 'inline-input';
+          inp.type = 'number';
+          inp.min = '0';
+          inp.placeholder = 'Delay (ms)';
+          var go = document.createElement('button');
+          go.className = 'btn btn-primary';
+          go.textContent = 'Apply';
+          go.style.fontSize = '12px';
+          go.style.padding = '4px 10px';
+          go.onclick = function() { changeDelay(j.id, inp.value); };
+          ig.appendChild(inp);
+          ig.appendChild(go);
+          actionGroup.parentNode.insertBefore(ig, actionGroup.nextSibling);
+        };
+        actionGroup.appendChild(delBtn);
+
+        body.appendChild(actionGroup);
+      }
     }
   }
 
@@ -1099,6 +1532,34 @@
     if (!selectedQueue) return;
     try { await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/jobs/' + encodeURIComponent(id) + '/promote', { method: 'POST' }); toast('Job ' + id + ' promoted', 'success'); loadJobs(); }
     catch (e) { toast('Promote failed', 'error'); }
+  }
+
+  async function changePriority(id, value) {
+    if (!selectedQueue) return;
+    var priority = parseInt(value, 10);
+    if (isNaN(priority) || priority < 0) { toast('Priority must be a non-negative number', 'error'); return; }
+    try {
+      await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/jobs/' + encodeURIComponent(id) + '/priority', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ priority: priority })
+      });
+      toast('Priority changed to ' + priority, 'success');
+      inspectJob(id);
+      loadJobs();
+    } catch (e) { toast('Change priority failed: ' + e.message, 'error'); }
+  }
+
+  async function changeDelay(id, value) {
+    if (!selectedQueue) return;
+    var delay = parseInt(value, 10);
+    if (isNaN(delay) || delay < 0) { toast('Delay must be a non-negative number (ms)', 'error'); return; }
+    try {
+      await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/jobs/' + encodeURIComponent(id) + '/delay', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ delay: delay })
+      });
+      toast('Delay changed to ' + fmtDuration(delay), 'success');
+      inspectJob(id);
+      loadJobs();
+    } catch (e) { toast('Change delay failed: ' + e.message, 'error'); }
   }
 
   function obliterate() {
@@ -1212,7 +1673,9 @@
     inspectJob: inspectJob, setInspectorTab: setInspectorTab, closeInspector: closeInspector,
     togglePause: togglePause, retryJob: retryJob, removeJob: removeJob, promoteJob: promoteJob,
     obliterate: obliterate, drainQueue: drainQueue, retryAll: retryAll, cleanQueue: cleanQueue,
-    toggleEvents: toggleEvents, clearEvents: clearEvents
+    toggleEvents: toggleEvents, clearEvents: clearEvents,
+    changePriority: changePriority, changeDelay: changeDelay,
+    toggleSchedulerForm: toggleSchedulerForm, deleteScheduler: deleteScheduler
   };
 
   loadQueues();
