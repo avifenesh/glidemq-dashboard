@@ -1,200 +1,144 @@
 # @glidemq/dashboard
 
 [![npm](https://img.shields.io/npm/v/@glidemq/dashboard)](https://www.npmjs.com/package/@glidemq/dashboard)
-[![CI](https://github.com/avifenesh/glidemq-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/avifenesh/glidemq-dashboard/actions)
 [![license](https://img.shields.io/npm/l/@glidemq/dashboard)](https://github.com/avifenesh/glidemq-dashboard/blob/main/LICENSE)
 
-Web dashboard for monitoring and managing [glide-mq](https://github.com/avifenesh/glide-mq) queues. Express middleware that serves a real-time UI and REST API.
+Real-time web dashboard for [glide-mq](https://github.com/avifenesh/glide-mq) queues. Drop-in Express middleware -- no frontend build, no external dependencies.
 
-Drop-in Express middleware - one function call gives you a full queue monitoring UI with real-time SSE updates, job inspection, bulk actions, and per-queue authorization. Zero frontend build step, zero external dependencies.
+> If glide-mq is useful to you, consider giving it a [star on GitHub](https://github.com/avifenesh/glide-mq). It helps others discover the project.
 
-Part of the **glide-mq** ecosystem:
-
-| Package | Purpose |
-|---------|---------|
-| [glide-mq](https://github.com/avifenesh/glide-mq) | Core queue library - producers, workers, schedulers, workflows |
-| [@glidemq/hono](https://github.com/avifenesh/glidemq-hono) | Hono REST API + SSE middleware |
-| **@glidemq/dashboard** | Express web UI for monitoring and managing queues (you are here) |
-| [@glidemq/nestjs](https://github.com/avifenesh/glidemq-nestjs) | NestJS module - decorators, DI, lifecycle management |
-| [examples](https://github.com/avifenesh/glidemq-examples) | Framework integrations and use-case examples |
-
-## Installation
+## Install
 
 ```bash
-npm install @glidemq/dashboard
+npm install @glidemq/dashboard glide-mq express
 ```
 
-**Peer dependencies:** `glide-mq >= 0.8.0`, `express ^4 || ^5`
-
-## Quick Start
+## Quick start
 
 ```typescript
-import express from 'express';
-import { Queue } from 'glide-mq';
-import { createDashboard } from '@glidemq/dashboard';
+import express from "express";
+import { Queue } from "glide-mq";
+import { createDashboard } from "@glidemq/dashboard";
 
 const app = express();
-const queue = new Queue('payments', { connection: { addresses: [{ host: 'localhost', port: 6379 }] } });
+const queue = new Queue("payments", {
+  connection: { addresses: [{ host: "localhost", port: 6379 }] },
+});
 
-app.use('/dashboard', createDashboard([queue]));
+app.use("/dashboard", createDashboard([queue]));
 app.listen(3000);
 // Open http://localhost:3000/dashboard
 ```
 
-## Options
+## Why @glidemq/dashboard
+
+- Use this when you need visibility into queue health, job states, and worker activity without writing your own tooling.
+- Use this when you want live updates pushed to the browser via SSE instead of polling a CLI or database.
+- Use this when your ops team needs a point-and-click interface for retrying failed jobs, draining queues, or inspecting payloads.
+- Use this when you need per-action authorization so developers can view queues but only admins can obliterate them.
+
+## Features
+
+- **Real-time event stream** -- SSE pushes completed, failed, active, waiting, stalled, progress, and removed events to the browser as they happen.
+- **Job inspection** -- view payload, options, logs, progress, return value, and failure reason for any job.
+- **Bulk actions** -- pause, resume, drain, retry all failed, and clean old jobs at the queue level.
+- **Per-job actions** -- retry a failed job, remove a job, or promote a delayed job to waiting.
+- **Workers panel** -- see connected workers and their current status.
+- **Schedulers view** -- list repeatable job configurations attached to each queue.
+- **Dead letter queue** -- dedicated panel for jobs that exhausted all retries.
+- **Throughput metrics** -- completed and failed counts per queue.
+- **Job search** -- filter by name, state, or data content.
+- **Authorization** -- `readOnly` mode or fine-grained `authorize` callback with per-action control.
+- **Dark theme, responsive layout** -- works on desktop and mobile out of the box.
+- **Self-contained** -- the UI is a single bundled HTML file; no CDN calls, no build step, no frontend framework.
+
+## Configuration
 
 ```typescript
 createDashboard(queues: Queue[], opts?: DashboardOptions): Router
 ```
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `queueEvents` | `QueueEvents[]` | Instances to stream real-time SSE events from |
-| `readOnly` | `boolean` | When `true`, all mutation routes return 403 |
-| `authorize` | `(req, action) => boolean \| Promise<boolean>` | Custom auth callback for mutation routes |
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `queueEvents` | `QueueEvents[]` | `[]` | Instances to stream real-time SSE events from (one per queue) |
+| `readOnly` | `boolean` | `false` | When `true`, all mutation routes return 403 |
+| `authorize` | `(req, action) => boolean \| Promise<boolean>` | -- | Called before each mutation; return `false` to deny (403) |
 
-### Authorization
+## Authorization
 
-Every mutation endpoint (POST/DELETE) calls the `authorize` callback with the Express request and an action string before executing. Return `false` to deny (403).
+Every mutation endpoint calls the `authorize` callback with the Express request and an action string. Return `false` to deny the request with a 403.
 
-**Action strings:** `queue:pause`, `queue:resume`, `queue:obliterate`, `queue:drain`, `queue:retryAll`, `queue:clean`, `job:remove`, `job:retry`, `job:promote`, `job:changePriority`, `job:changeDelay`, `scheduler:upsert`, `scheduler:remove`
+**Action strings:** `queue:pause`, `queue:resume`, `queue:obliterate`, `queue:drain`, `queue:retryAll`, `queue:clean`, `job:remove`, `job:retry`, `job:promote`
 
 ```typescript
-// Read-only mode - no mutations allowed
-app.use('/dashboard', createDashboard(queues, { readOnly: true }));
-
-// Custom auth - check session cookie
-app.use('/dashboard', createDashboard(queues, {
-  authorize: (req, action) => {
-    const user = req.session?.user;
-    if (!user) return false;
-    // Only admins can obliterate
-    if (action === 'queue:obliterate') return user.role === 'admin';
-    return true;
-  },
-}));
+app.use(
+  "/dashboard",
+  createDashboard(queues, {
+    authorize: (req, action) => {
+      const user = req.session?.user;
+      if (!user) return false;
+      if (action === "queue:obliterate") return user.role === "admin";
+      return true;
+    },
+  })
+);
 ```
 
-## API Endpoints
+## API endpoints
 
 ### Read
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/` | Dashboard UI |
-| GET | `/api/queues` | All queues with job counts |
-| GET | `/api/queues/:name/jobs` | Jobs by state (query: `state`, `start`, `end`, `excludeData`) |
-| GET | `/api/queues/:name/job/:id` | Single job with logs, state, and extended fields |
+| GET | `/` | Dashboard HTML UI |
+| GET | `/api/queues` | All queues with job counts and pause state |
+| GET | `/api/queues/:name/jobs` | Jobs by state (`?state=`, `?start=`, `?end=`) |
+| GET | `/api/queues/:name/job/:id` | Single job with logs and current state |
 | GET | `/api/queues/:name/workers` | Connected workers |
-| GET | `/api/queues/:name/schedulers` | Job schedulers (repeatable jobs) |
+| GET | `/api/queues/:name/schedulers` | Repeatable job configurations |
 | GET | `/api/queues/:name/dlq` | Dead letter queue jobs |
-| GET | `/api/queues/:name/metrics` | Time-series metrics with per-minute completed/failed data |
-| GET | `/api/queues/:name/search` | Search jobs (query: `name`, `state`, `data`, `limit`) |
-| GET | `/api/events` | SSE event stream (real-time) |
-
-#### Jobs endpoint query parameters
-
-| Param | Type | Description |
-|-------|------|-------------|
-| `state` | string | Filter by job state (`waiting`, `active`, `delayed`, `completed`, `failed`) |
-| `start` | number | Pagination start index (default `0`) |
-| `end` | number | Pagination end index (default `20`, max `start + 200`) |
-| `excludeData` | `"true"` | When set, omits `data` field from returned jobs for faster responses |
-
-#### Metrics response format
-
-The metrics endpoint returns time-series data with per-minute buckets:
-
-```json
-{
-  "completed": {
-    "count": 1234,
-    "data": [
-      { "timestamp": 1709800800000, "count": 42, "avgDuration": 150 }
-    ]
-  },
-  "failed": {
-    "count": 5,
-    "data": [
-      { "timestamp": 1709800800000, "count": 1, "avgDuration": 3200 }
-    ]
-  }
-}
-```
-
-#### Job serialization
-
-Job responses include standard fields plus extended fields when present:
-
-| Field | Description |
-|-------|-------------|
-| `parentId` | Parent job ID (if job is a child in a flow) |
-| `parentQueue` | Parent job's queue name |
-| `orderingKey` | Ordering key for FIFO grouping |
-| `cost` | Job cost for rate-limited queues |
-| `schedulerName` | Name of the scheduler that created this job |
+| GET | `/api/queues/:name/metrics` | Completed/failed throughput counts |
+| GET | `/api/queues/:name/search` | Search jobs (`?name=`, `?state=`, `?data=`, `?limit=`) |
 
 ### Mutations (guarded by `readOnly` / `authorize`)
 
-| Method | Path | Body | Action | Description |
-|--------|------|------|--------|-------------|
-| POST | `/api/queues/:name/pause` | - | `queue:pause` | Pause queue |
-| POST | `/api/queues/:name/resume` | - | `queue:resume` | Resume queue |
-| POST | `/api/queues/:name/obliterate` | - | `queue:obliterate` | Destroy queue and all data |
-| POST | `/api/queues/:name/drain` | `{ delayed?: boolean }` | `queue:drain` | Remove all waiting jobs |
-| POST | `/api/queues/:name/retry-all` | `{ count?: number }` | `queue:retryAll` | Bulk retry failed jobs |
-| POST | `/api/queues/:name/clean` | `{ grace, limit, type }` | `queue:clean` | Clean old completed/failed jobs |
-| DELETE | `/api/queues/:name/jobs/:id` | - | `job:remove` | Remove a job |
-| POST | `/api/queues/:name/jobs/:id/retry` | - | `job:retry` | Retry a failed job |
-| POST | `/api/queues/:name/jobs/:id/promote` | - | `job:promote` | Promote a delayed job |
-| POST | `/api/queues/:name/jobs/:id/priority` | `{ priority: number }` | `job:changePriority` | Change job priority |
-| POST | `/api/queues/:name/jobs/:id/delay` | `{ delay: number }` | `job:changeDelay` | Change job delay (ms) |
-| POST | `/api/queues/:name/schedulers` | `{ name, schedule, template? }` | `scheduler:upsert` | Create or update a scheduler |
-| DELETE | `/api/queues/:name/schedulers/:schedulerName` | - | `scheduler:remove` | Remove a scheduler |
+| Method | Path | Action | Description |
+|--------|------|--------|-------------|
+| POST | `/api/queues/:name/pause` | `queue:pause` | Pause a queue |
+| POST | `/api/queues/:name/resume` | `queue:resume` | Resume a paused queue |
+| POST | `/api/queues/:name/obliterate` | `queue:obliterate` | Destroy a queue and all its data |
+| POST | `/api/queues/:name/drain` | `queue:drain` | Remove all waiting jobs |
+| POST | `/api/queues/:name/retry-all` | `queue:retryAll` | Bulk retry failed jobs |
+| POST | `/api/queues/:name/clean` | `queue:clean` | Clean old completed/failed jobs |
+| DELETE | `/api/queues/:name/jobs/:id` | `job:remove` | Remove a single job |
+| POST | `/api/queues/:name/jobs/:id/retry` | `job:retry` | Retry a failed job |
+| POST | `/api/queues/:name/jobs/:id/promote` | `job:promote` | Promote a delayed job to waiting |
 
-#### Scheduler upsert body
+SSE stream: `GET /api/events` -- server-sent events for real-time updates (requires `queueEvents` option).
 
-```json
-{
-  "name": "my-scheduler",
-  "schedule": {
-    "pattern": "*/5 * * * *",
-    "every": 60000,
-    "repeatAfterComplete": 30000,
-    "tz": "America/New_York",
-    "startDate": "2025-01-01",
-    "endDate": "2025-12-31",
-    "limit": 1000
-  },
-  "template": {
-    "name": "my-job",
-    "data": { "key": "value" },
-    "opts": { "priority": 5 }
-  }
-}
-```
+## Limitations
 
-Provide exactly one of `pattern` (cron), `every` (interval ms), or `repeatAfterComplete` (ms) in the schedule object.
+- Express only. There is no built-in adapter for Koa, Fastify, or Hono (see [@glidemq/hono](https://github.com/avifenesh/glidemq-hono) for Hono).
+- This is middleware, not a standalone server. You mount it on an existing Express app.
+- Requires `glide-mq` Queue instances. It does not connect to Valkey/Redis directly.
 
-## Features
+## Ecosystem
 
-- Queue overview with aggregated job counts
-- Job inspector with data, logs, and details tabs
-- **Time-series metrics** with per-minute bar charts for completed and failed jobs
-- Real-time event stream via SSE
-- Workers monitoring panel
-- **Scheduler management** - view, create, and delete job schedulers from the UI
-- Dead letter queue panel
-- Job search by name, state, and data
-- Bulk actions: drain, retry all, clean
-- Per-job actions: retry, remove, promote, **change priority**, **change delay**
-- **Enhanced job details** - parent links, ordering key, cost, LIFO badge, custom job ID
-- **excludeData support** for lightweight job listing
-- Authorization with per-action granularity
-- Dark theme, responsive layout
-- Express 4 and 5 compatible
-- Self-contained - no frontend build, no external CDN
+| Package | Description |
+|---------|-------------|
+| [glide-mq](https://github.com/avifenesh/glide-mq) | Core queue library -- producers, workers, schedulers, workflows |
+| **@glidemq/dashboard** | Express web dashboard (you are here) |
+| [@glidemq/nestjs](https://github.com/avifenesh/glidemq-nestjs) | NestJS module -- decorators, DI, lifecycle management |
+| [@glidemq/hono](https://github.com/avifenesh/glidemq-hono) | Hono REST API + SSE middleware |
+| [@glidemq/fastify](https://github.com/avifenesh/glidemq-fastify) | Fastify plugin for queue APIs |
+| [examples](https://github.com/avifenesh/glidemq-examples) | Framework integrations and use-case demos |
+
+> If glide-mq is useful to you, consider giving it a [star on GitHub](https://github.com/avifenesh/glide-mq). It helps the project grow.
+
+## Contributing
+
+Contributions, issues, and feature requests are welcome. Please open an issue on [GitHub](https://github.com/avifenesh/glidemq-dashboard/issues) before submitting large changes.
 
 ## License
 
-Apache-2.0
+[Apache-2.0](./LICENSE)
