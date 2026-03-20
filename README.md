@@ -2,6 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/@glidemq/dashboard)](https://www.npmjs.com/package/@glidemq/dashboard)
 [![license](https://img.shields.io/npm/l/@glidemq/dashboard)](https://github.com/avifenesh/glidemq-dashboard/blob/main/LICENSE)
+[![docs](https://img.shields.io/badge/docs-glide--mq.dev-6366f1)](https://avifenesh.github.io/glide-mq.dev/)
 
 Real-time web dashboard for [glide-mq](https://github.com/avifenesh/glide-mq) queues. Drop-in Express middleware -- no frontend build, no external dependencies.
 
