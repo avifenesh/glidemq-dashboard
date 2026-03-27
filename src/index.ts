@@ -54,6 +54,11 @@ function serializeJob(j: Job): Record<string, unknown> {
   if ((j as any).orderingKey != null) result.orderingKey = (j as any).orderingKey;
   if ((j as any).cost != null) result.cost = (j as any).cost;
   if ((j as any).schedulerName != null) result.schedulerName = (j as any).schedulerName;
+  if ((j as any).usage) result.usage = (j as any).usage;
+  if ((j as any).signals?.length) result.signals = (j as any).signals;
+  if ((j as any).budgetKey) result.budgetKey = (j as any).budgetKey;
+  if ((j as any).fallbackIndex) result.fallbackIndex = (j as any).fallbackIndex;
+  if ((j as any).tpmTokens != null) result.tpmTokens = (j as any).tpmTokens;
   return result;
 }
 
@@ -297,6 +302,64 @@ export function createDashboard(
     try {
       const jobs = await queue.searchJobs(searchOpts);
       res.json(jobs.map(serializeJob));
+    } catch (err) {
+      safeError(res, err);
+    }
+  });
+
+  // ===== AI-NATIVE ENDPOINTS =====
+
+  // --- Flow usage aggregation ---
+  router.get('/api/queues/:name/flows/:id/usage', async (req: Request, res: Response) => {
+    const queue = queueMap.get(param(req, 'name'));
+    if (!queue) {
+      res.status(404).json({ error: 'Queue not found' });
+      return;
+    }
+    try {
+      const usage = await (queue as any).getFlowUsage(param(req, 'id'));
+      res.json(usage);
+    } catch (err) {
+      safeError(res, err);
+    }
+  });
+
+  // --- Flow budget state ---
+  router.get('/api/queues/:name/flows/:id/budget', async (req: Request, res: Response) => {
+    const queue = queueMap.get(param(req, 'name'));
+    if (!queue) {
+      res.status(404).json({ error: 'Queue not found' });
+      return;
+    }
+    try {
+      const budget = await (queue as any).getFlowBudget(param(req, 'id'));
+      if (!budget) {
+        res.status(404).json({ error: 'No budget for this flow' });
+        return;
+      }
+      res.json(budget);
+    } catch (err) {
+      safeError(res, err);
+    }
+  });
+
+  // --- Job stream SSE ---
+  router.get('/api/queues/:name/jobs/:id/stream', async (req: Request, res: Response) => {
+    const queue = queueMap.get(param(req, 'name'));
+    if (!queue) {
+      res.status(404).json({ error: 'Queue not found' });
+      return;
+    }
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    const lastId = req.query.lastId as string | undefined;
+    try {
+      const entries = await (queue as any).readStream(param(req, 'id'), { lastId, count: 100 });
+      for (const entry of entries) {
+        res.write(`id: ${entry.id}\nevent: chunk\ndata: ${JSON.stringify(entry.fields)}\n\n`);
+      }
+      res.end();
     } catch (err) {
       safeError(res, err);
     }
@@ -589,7 +652,7 @@ export function createDashboard(
     res.write('\n');
 
     const listeners: { qe: QueueEvents; event: string; handler: (payload: unknown) => void }[] = [];
-    const eventNames = ['completed', 'failed', 'progress', 'active', 'waiting', 'stalled', 'removed'];
+    const eventNames = ['completed', 'failed', 'progress', 'active', 'waiting', 'stalled', 'removed', 'usage', 'suspended', 'budget-exceeded'];
 
     for (const qe of queueEvents) {
       for (const eventName of eventNames) {

@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/@glidemq/dashboard)](https://www.npmjs.com/package/@glidemq/dashboard)
 [![license](https://img.shields.io/npm/l/@glidemq/dashboard)](https://github.com/avifenesh/glidemq-dashboard/blob/main/LICENSE)
 
-Real-time web dashboard for monitoring and managing [glide-mq](https://github.com/avifenesh/glide-mq) queues - drop-in Express middleware, no frontend build required.
+Real-time dashboard for [glide-mq](https://github.com/avifenesh/glide-mq) - queue monitoring with AI observability. Drop-in Express middleware, no frontend build required.
 
 ## Why
 
@@ -17,7 +17,7 @@ Real-time web dashboard for monitoring and managing [glide-mq](https://github.co
 npm install @glidemq/dashboard glide-mq express
 ```
 
-Requires **glide-mq >= 0.13.0** and **Express 4 or 5**.
+Requires **glide-mq >= 0.14.0** and **Express 4 or 5**.
 
 ## Quick start
 
@@ -38,7 +38,15 @@ app.listen(3000);
 
 ## AI-native features
 
-When paired with glide-mq 0.13+, the dashboard surfaces AI orchestration data out of the box - token/cost tracking via `reportUsage()`, streaming status, suspend/signal state, budget spend vs. limit, model failover attempts, and rate-limit throttle state. See the [glide-mq docs](https://github.com/avifenesh/glide-mq) for details.
+Job detail views include AI fields when present: `usage` (record-based token/cost breakdown), `signals`, `budgetKey`, `fallbackIndex`, and `tpmTokens`.
+
+Three dedicated endpoints expose AI orchestration state:
+
+- **`GET /api/queues/:name/flows/:id/usage`** - Aggregated token/cost usage across all jobs in a flow. Returns the combined usage record.
+- **`GET /api/queues/:name/flows/:id/budget`** - Budget state for a flow - current spend, per-category caps, remaining budget. Returns 404 if no budget is set.
+- **`GET /api/queues/:name/jobs/:id/stream`** - SSE endpoint for streaming job output chunks. Supports `?lastId=` for resumption. Returns `event: chunk` messages with entry fields as data.
+
+SSE event stream (`/api/events`) now includes `usage`, `suspended`, and `budget-exceeded` events alongside the standard queue lifecycle events.
 
 ## API
 
