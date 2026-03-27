@@ -14,7 +14,7 @@ Real-time web dashboard for [glide-mq](https://github.com/avifenesh/glide-mq) qu
 npm install @glidemq/dashboard glide-mq express
 ```
 
-Requires **glide-mq 0.9+** and **Express 4 or 5**.
+Requires **glide-mq 0.13+** and **Express 4 or 5**.
 
 ## Quick start
 
@@ -54,6 +54,17 @@ app.listen(3000);
 - **Authorization** -- `readOnly` mode or fine-grained `authorize` callback with per-action control.
 - **Dark theme, responsive layout** -- works on desktop and mobile out of the box.
 - **Self-contained** -- the UI is a single bundled HTML file; no CDN calls, no build step, no frontend framework.
+
+## AI-native features (glide-mq 0.13+)
+
+glide-mq is now an AI-native orchestration queue. The dashboard surfaces these capabilities out of the box when paired with glide-mq 0.13+:
+
+- **Token/cost tracking** -- jobs that call `reportUsage()` expose token counts and cost data in the job detail view. Flow-level aggregation via `getFlowUsage()` is visible on parent jobs.
+- **Streaming status** -- workers using `job.stream()` and consumers reading via `readStream()` or SSE show live streaming state in the dashboard event stream.
+- **Suspend/signal** -- jobs paused with `suspend()` for human-in-the-loop approval appear with a suspended badge. Signal events (`signal()`) are reflected in real time.
+- **Budget monitoring** -- flows configured with budget caps display current spend vs. limit. Jobs rejected by budget middleware show the budget-exceeded reason.
+- **Model failover** -- jobs processed through fallback chains show which model/provider handled them and how many fallback attempts occurred.
+- **Rate limiting** -- workers configured with RPM + TPM dual-axis rate limiting surface throttle state in the workers panel.
 
 ## Configuration
 
@@ -129,7 +140,7 @@ SSE stream: `GET /api/events` -- server-sent events for real-time updates (requi
 
 | Package | Description |
 |---------|-------------|
-| [glide-mq](https://github.com/avifenesh/glide-mq) | Core queue library -- producers, workers, schedulers, workflows |
+| [glide-mq](https://github.com/avifenesh/glide-mq) | AI-native queue library -- orchestration, streaming, failover, budget caps |
 | **@glidemq/dashboard** | Express web dashboard (you are here) |
 | [@glidemq/nestjs](https://github.com/avifenesh/glidemq-nestjs) | NestJS module -- decorators, DI, lifecycle management |
 | [@glidemq/hono](https://github.com/avifenesh/glidemq-hono) | Hono REST API + SSE middleware |
