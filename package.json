@@ -15,7 +15,7 @@
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run build"
   },
-  "homepage": "https://avifenesh.github.io/glide-mq.dev/integrations/dashboard",
+  "homepage": "https://avifenesh.github.io/glidemq.dev/integrations/dashboard",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/avifenesh/glidemq-dashboard.git"

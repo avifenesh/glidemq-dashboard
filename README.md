@@ -83,7 +83,7 @@ app.use(
 ## Links
 
 - [glide-mq](https://github.com/avifenesh/glide-mq) - core library
-- [Full documentation](https://avifenesh.github.io/glide-mq.dev/integrations/dashboard)
+- [Full documentation](https://avifenesh.github.io/glidemq.dev/integrations/dashboard)
 - [Issues](https://github.com/avifenesh/glidemq-dashboard/issues)
 - [@glidemq/nestjs](https://github.com/avifenesh/glidemq-nestjs) | [@glidemq/hono](https://github.com/avifenesh/glidemq-hono) | [@glidemq/fastify](https://github.com/avifenesh/glidemq-fastify) | [@glidemq/hapi](https://github.com/avifenesh/glidemq-hapi)
 
