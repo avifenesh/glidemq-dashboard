@@ -317,7 +317,7 @@ export function createDashboard(
       return;
     }
     try {
-      const usage = await (queue as any).getFlowUsage(param(req, 'id'));
+      const usage = await queue.getFlowUsage(param(req, 'id'));
       res.json(usage);
     } catch (err) {
       safeError(res, err);
@@ -332,7 +332,7 @@ export function createDashboard(
       return;
     }
     try {
-      const budget = await (queue as any).getFlowBudget(param(req, 'id'));
+      const budget = await queue.getFlowBudget(param(req, 'id'));
       if (!budget) {
         res.status(404).json({ error: 'No budget for this flow' });
         return;
@@ -355,7 +355,7 @@ export function createDashboard(
     res.setHeader('Connection', 'keep-alive');
     const lastId = req.query.lastId as string | undefined;
     try {
-      const entries = await (queue as any).readStream(param(req, 'id'), { lastId, count: 100 });
+      const entries = await queue.readStream(param(req, 'id'), { lastId, count: 100 });
       for (const entry of entries) {
         res.write(`id: ${entry.id}\nevent: chunk\ndata: ${JSON.stringify(entry.fields)}\n\n`);
       }

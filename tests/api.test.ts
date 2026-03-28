@@ -43,7 +43,10 @@ function mockQueue(name: string, overrides: Record<string, unknown> = {}) {
     getWorkers: vi.fn().mockResolvedValue([]),
     getRepeatableJobs: vi.fn().mockResolvedValue([]),
     getDeadLetterJobs: vi.fn().mockResolvedValue([]),
-    getMetrics: vi.fn().mockResolvedValue({ count: 42 }),
+    getMetrics: vi.fn().mockResolvedValue({ count: 42, data: [], meta: { resolution: 'minute' } }),
+    getFlowUsage: vi.fn().mockResolvedValue({ tokens: {}, totalTokens: 0, costs: {}, totalCost: 0, jobCount: 0, models: {} }),
+    getFlowBudget: vi.fn().mockResolvedValue(null),
+    readStream: vi.fn().mockResolvedValue([]),
     searchJobs: vi.fn().mockResolvedValue([]),
     ...overrides,
   };
@@ -263,7 +266,7 @@ describe('GET /api/queues/:name/metrics', () => {
   it('returns completed and failed counts', async () => {
     const q = mockQueue('q', {
       getMetrics: vi.fn().mockImplementation((type: string) =>
-        Promise.resolve({ count: type === 'completed' ? 100 : 5 }),
+        Promise.resolve({ count: type === 'completed' ? 100 : 5, data: [], meta: { resolution: 'minute' } }),
       ),
     });
     const app = makeApp([q]);
@@ -421,5 +424,109 @@ describe('authorize callback', () => {
     const app = makeApp([q], { authorize: authFn });
     await request(app).post('/dash/api/queues/q/pause');
     expect(authFn).toHaveBeenCalledWith(expect.anything(), 'queue:pause');
+  });
+});
+
+// --- AI field serialization ---
+
+describe('AI field serialization', () => {
+  it('includes usage, signals, budgetKey, fallbackIndex, tpmTokens when present', async () => {
+    const job = mockJob('ai1', {
+      usage: { input_tokens: 100, output_tokens: 50 },
+      signals: ['budget-warning'],
+      budgetKey: 'flow:abc',
+      fallbackIndex: 1,
+      tpmTokens: 150,
+    });
+    const q = mockQueue('q', {
+      getJob: vi.fn().mockResolvedValue(job),
+      getJobLogs: vi.fn().mockResolvedValue({ logs: [], count: 0 }),
+    });
+    const app = makeApp([q]);
+    const res = await request(app).get('/dash/api/queues/q/job/ai1');
+    expect(res.status).toBe(200);
+    expect(res.body.usage).toEqual({ input_tokens: 100, output_tokens: 50 });
+    expect(res.body.signals).toEqual(['budget-warning']);
+    expect(res.body.budgetKey).toBe('flow:abc');
+    expect(res.body.fallbackIndex).toBe(1);
+    expect(res.body.tpmTokens).toBe(150);
+  });
+
+  it('omits AI fields when not present', async () => {
+    const job = mockJob('plain1');
+    const q = mockQueue('q', {
+      getJob: vi.fn().mockResolvedValue(job),
+      getJobLogs: vi.fn().mockResolvedValue({ logs: [], count: 0 }),
+    });
+    const app = makeApp([q]);
+    const res = await request(app).get('/dash/api/queues/q/job/plain1');
+    expect(res.status).toBe(200);
+    expect(res.body.usage).toBeUndefined();
+    expect(res.body.signals).toBeUndefined();
+    expect(res.body.budgetKey).toBeUndefined();
+    expect(res.body.fallbackIndex).toBeUndefined();
+    expect(res.body.tpmTokens).toBeUndefined();
+  });
+});
+
+// --- AI-native endpoints ---
+
+describe('GET /api/queues/:name/flows/:id/usage', () => {
+  it('returns aggregated flow usage', async () => {
+    const usage = { tokens: { input_tokens: 500 }, totalTokens: 500, costs: {}, totalCost: 0, jobCount: 3, models: { 'gpt-5.4': 3 } };
+    const q = mockQueue('q', { getFlowUsage: vi.fn().mockResolvedValue(usage) });
+    const app = makeApp([q]);
+    const res = await request(app).get('/dash/api/queues/q/flows/f1/usage');
+    expect(res.status).toBe(200);
+    expect(res.body.totalTokens).toBe(500);
+    expect(res.body.jobCount).toBe(3);
+  });
+
+  it('returns 404 for unknown queue', async () => {
+    const app = makeApp([mockQueue('q')]);
+    const res = await request(app).get('/dash/api/queues/nonexistent/flows/f1/usage');
+    expect(res.status).toBe(404);
+  });
+});
+
+describe('GET /api/queues/:name/flows/:id/budget', () => {
+  it('returns flow budget state', async () => {
+    const budget = { maxTotalTokens: 10000, usedTokens: 500, usedCost: 0, exceeded: false, onExceeded: 'pause' };
+    const q = mockQueue('q', { getFlowBudget: vi.fn().mockResolvedValue(budget) });
+    const app = makeApp([q]);
+    const res = await request(app).get('/dash/api/queues/q/flows/f1/budget');
+    expect(res.status).toBe(200);
+    expect(res.body.maxTotalTokens).toBe(10000);
+    expect(res.body.exceeded).toBe(false);
+  });
+
+  it('returns 404 when no budget is set', async () => {
+    const q = mockQueue('q', { getFlowBudget: vi.fn().mockResolvedValue(null) });
+    const app = makeApp([q]);
+    const res = await request(app).get('/dash/api/queues/q/flows/f1/budget');
+    expect(res.status).toBe(404);
+    expect(res.body.error).toContain('No budget');
+  });
+});
+
+describe('GET /api/queues/:name/jobs/:id/stream', () => {
+  it('returns SSE stream entries', async () => {
+    const entries = [
+      { id: '1-0', fields: { chunk: 'hello' } },
+      { id: '2-0', fields: { chunk: 'world' } },
+    ];
+    const q = mockQueue('q', { readStream: vi.fn().mockResolvedValue(entries) });
+    const app = makeApp([q]);
+    const res = await request(app).get('/dash/api/queues/q/jobs/j1/stream');
+    expect(res.status).toBe(200);
+    expect(res.headers['content-type']).toMatch(/text\/event-stream/);
+    expect(res.text).toContain('event: chunk');
+    expect(res.text).toContain('"chunk":"hello"');
+  });
+
+  it('returns 404 for unknown queue', async () => {
+    const app = makeApp([mockQueue('q')]);
+    const res = await request(app).get('/dash/api/queues/nonexistent/jobs/j1/stream');
+    expect(res.status).toBe(404);
   });
 });

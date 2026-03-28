@@ -1,7 +1,7 @@
 {
   "name": "@glidemq/dashboard",
   "version": "0.3.0",
-  "description": "Web dashboard for glide-mq queue monitoring and management",
+  "description": "Web dashboard for glide-mq - queue monitoring, management, and AI observability",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -30,7 +30,7 @@
     "@types/node": "^22",
     "@types/supertest": "^6",
     "express": "^5",
-    "glide-mq": "latest",
+    "glide-mq": ">=0.14.0",
     "supertest": "^7",
     "typescript": "^5",
     "vitest": "^3"
@@ -41,6 +41,8 @@
     "queue",
     "monitor",
     "valkey",
-    "redis"
+    "redis",
+    "ai",
+    "observability"
   ]
 }
