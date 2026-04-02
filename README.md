@@ -44,6 +44,7 @@ Three dedicated endpoints expose AI orchestration state:
 
 - **`GET /api/queues/:name/flows/:id/usage`** - Aggregated token/cost usage across all jobs in a flow. Returns the combined usage record.
 - **`GET /api/queues/:name/flows/:id/budget`** - Budget state for a flow - current spend, per-category caps, remaining budget. Returns 404 if no budget is set.
+- **`GET /api/usage/summary`** - Rolling usage totals across all mounted queues or a `?queues=` subset. Supports `start`, `end`, `window`, and `windowMs`.
 - **`GET /api/queues/:name/jobs/:id/stream`** - SSE endpoint for streaming job output chunks. Supports `?lastId=` for resumption. Returns `event: chunk` messages with entry fields as data.
 
 SSE event stream (`/api/events`) now includes `usage`, `suspended`, and `budget-exceeded` events alongside the standard queue lifecycle events.
@@ -83,7 +84,7 @@ app.use(
 ## Links
 
 - [glide-mq](https://github.com/avifenesh/glide-mq) - core library
-- [Full documentation](https://avifenesh.github.io/glidemq.dev/integrations/dashboard)
+- [Full documentation](https://glidemq.dev/integrations/dashboard)
 - [Issues](https://github.com/avifenesh/glidemq-dashboard/issues)
 - [@glidemq/nestjs](https://github.com/avifenesh/glidemq-nestjs) | [@glidemq/hono](https://github.com/avifenesh/glidemq-hono) | [@glidemq/fastify](https://github.com/avifenesh/glidemq-fastify) | [@glidemq/hapi](https://github.com/avifenesh/glidemq-hapi)
 

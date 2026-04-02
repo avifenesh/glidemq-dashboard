@@ -343,6 +343,72 @@ export function createDashboard(
     }
   });
 
+  // --- Rolling usage summary across mounted queues ---
+  router.get('/api/usage/summary', async (req: Request, res: Response) => {
+    if (queues.length === 0) {
+      res.status(200).json({
+        startTime: Date.now(),
+        endTime: Date.now(),
+        bucketSizeMs: 60000,
+        queues: [],
+        jobCount: 0,
+        tokens: {},
+        totalTokens: 0,
+        costs: {},
+        totalCost: 0,
+        models: {},
+        perQueue: {},
+      });
+      return;
+    }
+
+    const requestedQueues = typeof req.query.queues === 'string'
+      ? req.query.queues.split(',').map((value) => value.trim()).filter(Boolean)
+      : undefined;
+
+    if (requestedQueues && requestedQueues.some((name) => !queueMap.has(name))) {
+      res.status(404).json({ error: 'Queue not found' });
+      return;
+    }
+
+    const startTime = typeof req.query.start === 'string' ? Number(req.query.start) : undefined;
+    const endTime = typeof req.query.end === 'string' ? Number(req.query.end) : undefined;
+    const windowRaw = typeof req.query.window === 'string' ? req.query.window : undefined;
+    const windowMsRaw = typeof req.query.windowMs === 'string' ? req.query.windowMs : undefined;
+
+    if (windowRaw && windowMsRaw && windowRaw !== windowMsRaw) {
+      res.status(400).json({ error: 'window and windowMs must match when both are provided' });
+      return;
+    }
+
+    const windowMs = windowMsRaw ?? windowRaw;
+    const numericValues = [
+      ['start', startTime],
+      ['end', endTime],
+      [windowMsRaw ? 'windowMs' : 'window', windowMs != null ? Number(windowMs) : undefined],
+    ] as const;
+
+    for (const [label, value] of numericValues) {
+      if (value == null) continue;
+      if (!Number.isSafeInteger(value) || value < 0 || ((label === 'window' || label === 'windowMs') && value < 1)) {
+        res.status(400).json({ error: `${label} must be a valid integer` });
+        return;
+      }
+    }
+
+    try {
+      const summary = await (queues[0] as any).getUsageSummary({
+        endTime,
+        queues: requestedQueues ?? queues.map((queue) => queue.name),
+        startTime,
+        windowMs: windowMs != null ? Number(windowMs) : undefined,
+      });
+      res.json(summary);
+    } catch (err) {
+      safeError(res, err);
+    }
+  });
+
   // --- Job stream SSE ---
   router.get('/api/queues/:name/jobs/:id/stream', async (req: Request, res: Response) => {
     const queue = queueMap.get(param(req, 'name'));

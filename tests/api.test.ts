@@ -46,6 +46,30 @@ function mockQueue(name: string, overrides: Record<string, unknown> = {}) {
     getMetrics: vi.fn().mockResolvedValue({ count: 42, data: [], meta: { resolution: 'minute' } }),
     getFlowUsage: vi.fn().mockResolvedValue({ tokens: {}, totalTokens: 0, costs: {}, totalCost: 0, jobCount: 0, models: {} }),
     getFlowBudget: vi.fn().mockResolvedValue(null),
+    getUsageSummary: vi.fn().mockResolvedValue({
+      startTime: 0,
+      endTime: 60000,
+      bucketSizeMs: 60000,
+      queues: [name],
+      jobCount: 1,
+      tokens: { input: 100 },
+      totalTokens: 100,
+      costs: { total: 0.01 },
+      totalCost: 0.01,
+      costUnit: 'usd',
+      models: { 'gpt-5.4': 1 },
+      perQueue: {
+        [name]: {
+          jobCount: 1,
+          tokens: { input: 100 },
+          totalTokens: 100,
+          costs: { total: 0.01 },
+          totalCost: 0.01,
+          costUnit: 'usd',
+          models: { 'gpt-5.4': 1 },
+        },
+      },
+    }),
     readStream: vi.fn().mockResolvedValue([]),
     searchJobs: vi.fn().mockResolvedValue([]),
     ...overrides,
@@ -506,6 +530,31 @@ describe('GET /api/queues/:name/flows/:id/budget', () => {
     const res = await request(app).get('/dash/api/queues/q/flows/f1/budget');
     expect(res.status).toBe(404);
     expect(res.body.error).toContain('No budget');
+  });
+});
+
+describe('GET /api/usage/summary', () => {
+  it('returns a rolling usage summary across mounted queues', async () => {
+    const q = mockQueue('q');
+    const app = makeApp([q]);
+    const res = await request(app).get('/dash/api/usage/summary');
+    expect(res.status).toBe(200);
+    expect(res.body.totalTokens).toBe(100);
+    expect(q.getUsageSummary).toHaveBeenCalledWith(
+      expect.objectContaining({ queues: ['q'] }),
+    );
+  });
+
+  it('returns 404 when a requested queue is not mounted', async () => {
+    const app = makeApp([mockQueue('q')]);
+    const res = await request(app).get('/dash/api/usage/summary?queues=missing');
+    expect(res.status).toBe(404);
+  });
+
+  it('returns 400 for mismatched window and windowMs', async () => {
+    const app = makeApp([mockQueue('q')]);
+    const res = await request(app).get('/dash/api/usage/summary?window=1000&windowMs=2000');
+    expect(res.status).toBe(400);
   });
 });
 
