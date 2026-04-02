@@ -1,13 +1,14 @@
 {
   "name": "@glidemq/dashboard",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Web dashboard for glide-mq - queue monitoring, management, and AI observability",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsc && node scripts/copy-assets.js",
@@ -23,7 +24,7 @@
   "license": "Apache-2.0",
   "peerDependencies": {
     "express": "^4 || ^5",
-    "glide-mq": ">=0.14.0"
+    "glide-mq": ">=0.15.0"
   },
   "devDependencies": {
     "@types/express": "^5",
