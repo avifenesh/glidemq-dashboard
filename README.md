@@ -49,7 +49,7 @@ Three dedicated endpoints expose AI orchestration state:
 
 SSE event stream (`/api/events`) now includes `usage`, `suspended`, and `budget-exceeded` events alongside the standard queue lifecycle events.
 
-For write-side flow orchestration over HTTP (`POST /flows`, `GET /flows/:id`, `GET /flows/:id/tree`, `DELETE /flows/:id`), use the core glide-mq proxy or the Hono/Fastify/Hapi wrappers. The dashboard stays focused on inspection and operations.
+For write-side flow orchestration over HTTP (`POST /flows`, `GET /flows/:id`, `GET /flows/:id/tree`, `DELETE /flows/:id`), use the core glide-mq proxy or the HTTP wrapper integrations: `@glidemq/hono`, `@glidemq/fastify`, and `@glidemq/hapi`. The dashboard stays focused on inspection and operations.
 
 ## API
 
