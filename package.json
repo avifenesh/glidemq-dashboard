@@ -31,7 +31,7 @@
     "@types/node": "^22",
     "@types/supertest": "^6",
     "express": "^5",
-    "glide-mq": "^0.14.0",
+    "glide-mq": "^0.15.0",
     "supertest": "^7",
     "typescript": "^5",
     "vitest": "^3"
