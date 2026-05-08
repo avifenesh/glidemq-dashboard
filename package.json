@@ -24,14 +24,14 @@
   "license": "Apache-2.0",
   "peerDependencies": {
     "express": "^4 || ^5",
-    "glide-mq": ">=0.15.0"
+    "glide-mq": ">=0.15.2"
   },
   "devDependencies": {
     "@types/express": "^5",
     "@types/node": "^22",
     "@types/supertest": "^6",
     "express": "^5",
-    "glide-mq": "^0.15.0",
+    "glide-mq": "^0.15.2",
     "supertest": "^7",
     "typescript": "^5",
     "vitest": "^3"

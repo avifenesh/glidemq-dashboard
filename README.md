@@ -17,7 +17,7 @@ Real-time dashboard for [glide-mq](https://github.com/avifenesh/glide-mq) - queu
 npm install @glidemq/dashboard glide-mq express
 ```
 
-Requires **glide-mq >= 0.14.0** and **Express 4 or 5**.
+Requires **glide-mq >= 0.15.2** and **Express 4 or 5**.
 
 ## Quick start
 
