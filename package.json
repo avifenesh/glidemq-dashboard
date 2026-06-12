@@ -34,7 +34,7 @@
     "glide-mq": "^0.15.2",
     "supertest": "^7",
     "typescript": "^5",
-    "vitest": "^3"
+    "vitest": "^4"
   },
   "keywords": [
     "glide-mq",
