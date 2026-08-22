@@ -1652,7 +1652,9 @@
     type.textContent = evtType;
     var job = document.createElement('span');
     job.className = 'evt-job';
-    job.textContent = data.jobId ? '#' + data.jobId : '';
+    var payload = data.payload && typeof data.payload === 'object' ? data.payload : {};
+    var jobId = data.jobId != null ? data.jobId : payload.jobId;
+    job.textContent = jobId != null && jobId !== '' ? '#' + jobId : '';
     line.appendChild(time);
     line.appendChild(queue);
     line.appendChild(type);
