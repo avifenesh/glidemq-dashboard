@@ -421,9 +421,10 @@
         <div class="metric-card"><div class="metric-label">Total Failed</div><div class="metric-value red" id="mFailed">0</div></div>
         <div class="metric-card"><div class="metric-label">Total Waiting</div><div class="metric-value gray" id="mWaiting">0</div></div>
         <div class="metric-card"><div class="metric-label">Total Active</div><div class="metric-value blue" id="mActive">0</div></div>
+        <div class="metric-card"><div class="metric-label">Total Delayed</div><div class="metric-value gray" id="mDelayed">0</div></div>
       </div>
       <div class="overview-table-title">Queues</div>
-      <table class="overview-table"><thead><tr><th>Name</th><th>Waiting</th><th>Active</th><th>Completed</th><th>Failed</th></tr></thead><tbody id="overviewBody"></tbody></table>
+      <table class="overview-table"><thead><tr><th>Name</th><th>Waiting</th><th>Active</th><th>Delayed</th><th>Completed</th><th>Failed</th></tr></thead><tbody id="overviewBody"></tbody></table>
     </div>
 
     <div class="queue-view" id="queueView">
@@ -644,6 +645,7 @@
       countsDiv.className = 'queue-item-counts';
       countsDiv.appendChild(mkCountSpan('W', c.waiting));
       countsDiv.appendChild(mkCountSpan('A', c.active));
+      countsDiv.appendChild(mkCountSpan('D', c.delayed));
       countsDiv.appendChild(mkCountSpan('F', c.failed));
       div.appendChild(nameDiv);
       div.appendChild(countsDiv);
@@ -662,19 +664,20 @@
   }
 
   function renderOverview() {
-    var tw = 0, ta = 0, tc = 0, tf = 0;
-    queues.forEach(function(q) { var c = q.counts || {}; tw += c.waiting || 0; ta += c.active || 0; tc += c.completed || 0; tf += c.failed || 0; });
+    var tw = 0, ta = 0, td = 0, tc = 0, tf = 0;
+    queues.forEach(function(q) { var c = q.counts || {}; tw += c.waiting || 0; ta += c.active || 0; td += c.delayed || 0; tc += c.completed || 0; tf += c.failed || 0; });
     $('mCompleted').textContent = tc.toLocaleString();
     $('mFailed').textContent = tf.toLocaleString();
     $('mWaiting').textContent = tw.toLocaleString();
     $('mActive').textContent = ta.toLocaleString();
+    $('mDelayed').textContent = td.toLocaleString();
 
     var tbody = $('overviewBody');
     tbody.textContent = '';
     if (!queues.length) {
       var tr = document.createElement('tr');
       var td = document.createElement('td');
-      td.colSpan = 5;
+      td.colSpan = 6;
       td.className = 'empty-message';
       td.textContent = 'No queues found';
       tr.appendChild(td);
@@ -686,7 +689,7 @@
       var c = q.counts || {};
       var tr = document.createElement('tr');
       tr.onclick = function() { selectQueue(name); };
-      var cells = [name, c.waiting || 0, c.active || 0, c.completed || 0, c.failed || 0];
+      var cells = [name, c.waiting || 0, c.active || 0, c.delayed || 0, c.completed || 0, c.failed || 0];
       cells.forEach(function(val, i) {
         var td = document.createElement('td');
         if (i === 0) td.className = 'mono';
