@@ -155,6 +155,21 @@ describe('GET /api/queues/:name/jobs', () => {
     expect(res.status).toBe(200);
     expect(q.getJobs).toHaveBeenCalledTimes(5);
   });
+
+  it('treats end as inclusive for unfiltered lists, matching getJobs', async () => {
+    const waiting = Array.from({ length: 60 }, (_, i) => mockJob('w' + i, { timestamp: 1000 - i }));
+    const q = mockQueue('q', {
+      getJobs: vi.fn().mockImplementation(async (state: string, start = 0, end = -1) => {
+        const list = state === 'waiting' ? waiting : [];
+        return list.slice(start, end + 1);
+      }),
+    });
+    const app = makeApp([q]);
+    const unfiltered = await request(app).get('/dash/api/queues/q/jobs?start=0&end=50');
+    const filtered = await request(app).get('/dash/api/queues/q/jobs?state=waiting&start=0&end=50');
+    expect(unfiltered.body).toHaveLength(51);
+    expect(filtered.body).toHaveLength(51);
+  });
 });
 
 describe('GET /api/queues/:name/job/:id', () => {

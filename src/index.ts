@@ -179,7 +179,8 @@ export function createDashboard(
           }),
         );
         tagged.sort((a, b) => ((b.timestamp as number) ?? 0) - ((a.timestamp as number) ?? 0));
-        res.json(tagged.slice(start, endVal));
+        // `end` is inclusive, matching Queue.getJobs(state, start, end)
+        res.json(tagged.slice(start, endVal + 1));
       }
     } catch (err) {
       safeError(res, err);
