@@ -229,6 +229,8 @@
 
   .btn { font-family: var(--sans); font-size: 13px; font-weight: 500; padding: 6px 14px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-2); color: var(--text-1); cursor: pointer; transition: all 200ms ease; white-space: nowrap; }
   .btn:hover { background: var(--bg-3); border-color: var(--border-bright); color: var(--text-0); }
+  .btn:disabled { opacity: 0.4; cursor: default; }
+  .btn:disabled:hover { background: var(--bg-2); border-color: var(--border); color: var(--text-1); }
   .btn-danger { border-color: rgba(229, 72, 77, 0.3); color: var(--red); }
   .btn-danger:hover { background: rgba(229, 72, 77, 0.1); border-color: var(--red); }
   .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
@@ -254,6 +256,18 @@
   .search-input { flex: 1; font-family: var(--mono); font-size: 13px; padding: 6px 12px; background: var(--bg-0); border: 1px solid var(--border); border-radius: 4px; color: var(--text-0); outline: none; transition: border-color 200ms ease; }
   .search-input:focus { border-color: var(--accent); }
   .search-input::placeholder { color: var(--text-2); }
+
+  .job-pager {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 8px 20px;
+    flex-shrink: 0;
+    background: var(--bg-1);
+    border-top: 1px solid var(--border);
+  }
+  .job-pager-label { font-family: var(--mono); font-size: 12px; color: var(--text-2); }
 
   /* Job table */
   .job-table-wrap { flex: 1; overflow: auto; min-height: 0; }
@@ -484,6 +498,11 @@
         <div class="job-table-wrap" id="jobTableWrap">
           <table class="job-table"><thead><tr><th>ID</th><th>Name</th><th>State</th><th>Created</th><th>Actions</th></tr></thead><tbody id="jobBody"></tbody></table>
         </div>
+        <div class="job-pager" id="jobPager">
+          <button class="btn" id="jobPrev" onclick="S.pageJobs(-1)">Previous</button>
+          <span class="job-pager-label" id="jobPageLabel">Page 1</span>
+          <button class="btn" id="jobNext" onclick="S.pageJobs(1)">Next</button>
+        </div>
       </div>
 
       <div class="panel" id="panelWorkers"><div class="panel-content" id="workersContent"><div class="empty-message">Loading workers...</div></div></div>
@@ -537,6 +556,10 @@
   var isPaused = false;
   var eventSource = null;
   var eventCount = 0;
+  var jobPage = 0;
+  var jobHasMore = false;
+  var jobsAreSearch = false;
+  var JOB_PAGE_SIZE = 50;
 
   var BASE = window.location.pathname.replace(/\/$/, '');
   var $ = function(id) { return document.getElementById(id); };
@@ -742,6 +765,7 @@
     inspectedJobData = null;
     currentFilter = '';
     currentPanel = 'jobs';
+    jobPage = 0;
     isPaused = false;
     closeInspector();
     $('filterBar').querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
@@ -785,10 +809,53 @@
 
   async function loadJobs() {
     if (!selectedQueue) return;
-    var params = currentFilter ? '?state=' + currentFilter + '&start=0&end=50' : '?start=0&end=50';
+    jobsAreSearch = false;
+    var start = jobPage * JOB_PAGE_SIZE;
+    var end = start + JOB_PAGE_SIZE;
+    var params = '?start=' + start + '&end=' + end;
+    if (currentFilter) params = '?state=' + currentFilter + '&start=' + start + '&end=' + end;
+    var loadFailed = false;
     try { var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/jobs' + params); jobs = Array.isArray(data) ? data : []; }
-    catch (e) { jobs = []; }
+    catch (e) { jobs = []; loadFailed = true; toast('Failed to load jobs', 'error'); }
+    if (!loadFailed && jobPage > 0 && jobs.length === 0) { jobPage -= 1; return loadJobs(); }
+    var overFetched = jobs.length > JOB_PAGE_SIZE;
+    if (overFetched) jobs = jobs.slice(0, JOB_PAGE_SIZE);
+    var shown = jobPage * JOB_PAGE_SIZE + jobs.length;
+    jobHasMore = overFetched || shown < selectedQueueJobTotal(currentFilter);
     renderJobs();
+    updateJobPager();
+  }
+
+  function selectedQueueJobTotal(state) {
+    var q = queues.find(function(item) { return (item.name || item) === selectedQueue; });
+    var c = (q && q.counts) || {};
+    if (!state) {
+      return (c.waiting || 0) + (c.active || 0) + (c.delayed || 0) + (c.completed || 0) + (c.failed || 0);
+    }
+    return c[state] || 0;
+  }
+
+  function updateJobPager() {
+    var pager = $('jobPager');
+    var prev = $('jobPrev');
+    var next = $('jobNext');
+    var label = $('jobPageLabel');
+    if (!prev || !next || !label) return;
+    if (pager) pager.style.display = jobsAreSearch ? 'none' : '';
+    prev.disabled = jobPage <= 0;
+    next.disabled = !jobHasMore;
+    var start = jobs.length ? (jobPage * JOB_PAGE_SIZE) + 1 : 0;
+    var end = jobPage * JOB_PAGE_SIZE + jobs.length;
+    label.textContent = jobs.length ? ('Page ' + (jobPage + 1) + ' · ' + start + '–' + end) : 'Page 1';
+  }
+
+  function pageJobs(delta) {
+    if (jobsAreSearch) return;
+    var nextPage = jobPage + delta;
+    if (nextPage < 0) return;
+    if (delta > 0 && !jobHasMore) return;
+    jobPage = nextPage;
+    loadJobs();
   }
 
   function renderJobs() {
@@ -875,6 +942,7 @@
 
   function setFilter(tab, state) {
     currentFilter = state;
+    jobPage = 0;
     $('filterBar').querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
     tab.classList.add('active');
     $('searchInput').value = '';
@@ -888,11 +956,24 @@
     if (!q || !selectedQueue) return;
     var params = '?name=' + encodeURIComponent(q);
     if (currentFilter) params += '&state=' + currentFilter;
-    try { var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/search' + params); jobs = Array.isArray(data) ? data : []; renderJobs(); }
+    try {
+      var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/search' + params);
+      jobs = Array.isArray(data) ? data : [];
+      jobsAreSearch = true;
+      jobPage = 0;
+      jobHasMore = false;
+      renderJobs();
+      updateJobPager();
+    }
     catch (e) { toast('Search failed', 'error'); }
   }
 
-  function clearSearch() { $('searchInput').value = ''; loadJobs(); }
+  function clearSearch() {
+    $('searchInput').value = '';
+    jobsAreSearch = false;
+    jobPage = 0;
+    loadJobs();
+  }
 
   // --- Workers panel ---
 
@@ -1703,6 +1784,7 @@
     selectQueue: selectQueue, deselectQueue: deselectQueue, setPanel: setPanel, setFilter: setFilter,
     searchJobs: searchJobs, clearSearch: clearSearch,
     inspectJob: inspectJob, setInspectorTab: setInspectorTab, closeInspector: closeInspector,
+    pageJobs: pageJobs,
     togglePause: togglePause, retryJob: retryJob, removeJob: removeJob, promoteJob: promoteJob,
     obliterate: obliterate, drainQueue: drainQueue, retryAll: retryAll, cleanQueue: cleanQueue,
     toggleEvents: toggleEvents, clearEvents: clearEvents,
