@@ -1128,7 +1128,14 @@
         var jobName = j.name || (envelope && envelope.name) || '-';
         var tr = document.createElement('tr');
         tr.style.cursor = 'pointer';
-        tr.onclick = function() { inspectJob(jid); };
+        var origQueue = envelope && envelope.originalQueue;
+        tr.onclick = function() {
+          if (origQueue && origQueue !== selectedQueue && queues.some(function(item) { return (item.name || item) === origQueue; })) {
+            selectQueue(origQueue).then(function() { inspectJob(jid); });
+            return;
+          }
+          inspectJob(jid);
+        };
         var tdId = document.createElement('td'); tdId.className = 'cell-id'; tdId.textContent = jid;
         var tdName = document.createElement('td'); tdName.className = 'cell-name'; tdName.textContent = jobName;
         var tdFail = document.createElement('td'); tdFail.style.cssText = 'color:var(--red);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'; tdFail.textContent = failedReason || '-';
