@@ -540,6 +540,7 @@
   var eventCount = 0;
   var jobPage = 0;
   var jobHasMore = false;
+  var jobsAreSearch = false;
   var JOB_PAGE_SIZE = 50;
 
   var BASE = window.location.pathname.replace(/\/$/, '');
@@ -788,24 +789,39 @@
 
   async function loadJobs() {
     if (!selectedQueue) return;
+    jobsAreSearch = false;
     var start = jobPage * JOB_PAGE_SIZE;
     var end = start + JOB_PAGE_SIZE;
     var params = '?start=' + start + '&end=' + end;
     if (currentFilter) params = '?state=' + currentFilter + '&start=' + start + '&end=' + end;
+    var loadFailed = false;
     try { var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/jobs' + params); jobs = Array.isArray(data) ? data : []; }
-    catch (e) { jobs = []; }
-    if (jobPage > 0 && jobs.length === 0) { jobPage -= 1; return loadJobs(); }
-    jobHasMore = jobs.length > JOB_PAGE_SIZE;
-    if (jobs.length > JOB_PAGE_SIZE) jobs = jobs.slice(0, JOB_PAGE_SIZE);
+    catch (e) { jobs = []; loadFailed = true; toast('Failed to load jobs', 'error'); }
+    if (!loadFailed && jobPage > 0 && jobs.length === 0) { jobPage -= 1; return loadJobs(); }
+    var overFetched = jobs.length > JOB_PAGE_SIZE;
+    if (overFetched) jobs = jobs.slice(0, JOB_PAGE_SIZE);
+    var shown = jobPage * JOB_PAGE_SIZE + jobs.length;
+    jobHasMore = overFetched || shown < selectedQueueJobTotal(currentFilter);
     renderJobs();
     updateJobPager();
   }
 
+  function selectedQueueJobTotal(state) {
+    var q = queues.find(function(item) { return (item.name || item) === selectedQueue; });
+    var c = (q && q.counts) || {};
+    if (!state) {
+      return (c.waiting || 0) + (c.active || 0) + (c.delayed || 0) + (c.completed || 0) + (c.failed || 0);
+    }
+    return c[state] || 0;
+  }
+
   function updateJobPager() {
+    var pager = $('jobPager');
     var prev = $('jobPrev');
     var next = $('jobNext');
     var label = $('jobPageLabel');
     if (!prev || !next || !label) return;
+    if (pager) pager.style.display = jobsAreSearch ? 'none' : '';
     prev.disabled = jobPage <= 0;
     next.disabled = !jobHasMore;
     var start = jobs.length ? (jobPage * JOB_PAGE_SIZE) + 1 : 0;
@@ -814,6 +830,7 @@
   }
 
   function pageJobs(delta) {
+    if (jobsAreSearch) return;
     var nextPage = jobPage + delta;
     if (nextPage < 0) return;
     if (delta > 0 && !jobHasMore) return;
@@ -919,11 +936,24 @@
     if (!q || !selectedQueue) return;
     var params = '?name=' + encodeURIComponent(q);
     if (currentFilter) params += '&state=' + currentFilter;
-    try { var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/search' + params); jobs = Array.isArray(data) ? data : []; renderJobs(); }
+    try {
+      var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/search' + params);
+      jobs = Array.isArray(data) ? data : [];
+      jobsAreSearch = true;
+      jobPage = 0;
+      jobHasMore = false;
+      renderJobs();
+      updateJobPager();
+    }
     catch (e) { toast('Search failed', 'error'); }
   }
 
-  function clearSearch() { $('searchInput').value = ''; loadJobs(); }
+  function clearSearch() {
+    $('searchInput').value = '';
+    jobsAreSearch = false;
+    jobPage = 0;
+    loadJobs();
+  }
 
   // --- Workers panel ---
 
