@@ -121,6 +121,10 @@
     font-weight: 600;
     color: var(--text-0);
     letter-spacing: -0.3px;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
   }
 
   .queue-nav {
@@ -423,7 +427,7 @@
 
 <div class="app" id="app">
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header"><div class="logo">glide-mq</div></div>
+    <div class="sidebar-header"><button type="button" class="logo" onclick="S.deselectQueue()" title="All queues">glide-mq</button></div>
     <div class="queue-nav" id="queueNav"></div>
   </aside>
 
@@ -1681,7 +1685,7 @@
   document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeInspector(); });
 
   window.S = {
-    selectQueue: selectQueue, setPanel: setPanel, setFilter: setFilter,
+    selectQueue: selectQueue, deselectQueue: deselectQueue, setPanel: setPanel, setFilter: setFilter,
     searchJobs: searchJobs, clearSearch: clearSearch,
     inspectJob: inspectJob, setInspectorTab: setInspectorTab, closeInspector: closeInspector,
     togglePause: togglePause, retryJob: retryJob, removeJob: removeJob, promoteJob: promoteJob,
