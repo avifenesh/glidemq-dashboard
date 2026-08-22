@@ -456,6 +456,13 @@
       </div>
       <div class="overview-table-title">Queues</div>
       <table class="overview-table"><thead><tr><th>Name</th><th>Waiting</th><th>Active</th><th>Delayed</th><th>Completed</th><th>Failed</th></tr></thead><tbody id="overviewBody"></tbody></table>
+      <div class="overview-table-title" id="usageTitle" style="margin-top:32px;display:none">Usage</div>
+      <div class="metric-grid" id="usageGrid" style="display:none">
+        <div class="metric-card"><div class="metric-label">Total Tokens</div><div class="metric-value gray" id="mTokens">0</div></div>
+        <div class="metric-card"><div class="metric-label">Total Cost</div><div class="metric-value gray" id="mCost">0</div></div>
+        <div class="metric-card"><div class="metric-label">Usage Jobs</div><div class="metric-value gray" id="mUsageJobs">0</div></div>
+        <div class="metric-card"><div class="metric-label">Models</div><div class="metric-value gray" id="mModels">—</div></div>
+      </div>
     </div>
 
     <div class="queue-view" id="queueView">
@@ -664,8 +671,39 @@
   async function loadQueues() {
     try { var data = await api('/api/queues'); queues = Array.isArray(data) ? data : []; } catch (e) { /* keep existing */ }
     renderSidebar();
-    if (!selectedQueue) renderOverview();
+    if (!selectedQueue) {
+      renderOverview();
+      loadUsageSummary();
+    }
     if (selectedQueue) updateFilterCounts();
+  }
+
+  async function loadUsageSummary() {
+    try {
+      var data = await api('/api/usage/summary');
+      renderUsageSummary(data);
+    } catch (e) {
+      renderUsageSummary(null);
+    }
+  }
+
+  function renderUsageSummary(data) {
+    var grid = $('usageGrid');
+    var title = $('usageTitle');
+    if (!grid || !title) return;
+    var tokens = data && (data.totalTokens || 0);
+    var cost = data && (data.totalCost || 0);
+    var jobs = data && (data.jobCount || 0);
+    var models = data && data.models ? Object.keys(data.models) : [];
+    var has = tokens > 0 || cost > 0 || jobs > 0;
+    grid.style.display = has ? '' : 'none';
+    title.style.display = has ? '' : 'none';
+    if (!has) return;
+    $('mTokens').textContent = Number(tokens).toLocaleString();
+    var costNum = Number(cost);
+    $('mCost').textContent = costNum >= 0.01 ? '$' + costNum.toFixed(2) : '$' + costNum.toFixed(4);
+    $('mUsageJobs').textContent = Number(jobs).toLocaleString();
+    $('mModels').textContent = models.length ? models.join(', ') : '—';
   }
 
   function renderSidebar() {
@@ -803,6 +841,7 @@
     $('queueView').style.display = 'none';
     renderSidebar();
     renderOverview();
+    loadUsageSummary();
   }
 
   // --- Jobs ---
@@ -1428,6 +1467,13 @@
         frBlock.textContent = j.failedReason;
         body.appendChild(frBlock);
       }
+      if (j.usage) {
+        addSectionLabel(body, 'Usage');
+        var usageBlock = document.createElement('div');
+        usageBlock.className = 'json-block';
+        usageBlock.innerHTML = syntaxHL(JSON.stringify(j.usage, null, 2));
+        body.appendChild(usageBlock);
+      }
     } else if (inspectorTab === 'logs') {
       var logs = j.logs || [];
       if (!logs.length) { var msg = document.createElement('div'); msg.className = 'empty-message'; msg.textContent = 'No log entries'; body.appendChild(msg); }
@@ -1493,6 +1539,10 @@
 
       // Scheduler name
       if (j.schedulerName) addDetailRow(grid, 'Scheduler', j.schedulerName);
+      if (j.budgetKey) addDetailRow(grid, 'Budget Key', j.budgetKey);
+      if (j.fallbackIndex != null) addDetailRow(grid, 'Fallback Index', String(j.fallbackIndex));
+      if (j.tpmTokens != null) addDetailRow(grid, 'TPM Tokens', String(j.tpmTokens));
+      if (j.signals && j.signals.length) addDetailRow(grid, 'Signals', j.signals.join(', '));
 
       body.appendChild(grid);
 

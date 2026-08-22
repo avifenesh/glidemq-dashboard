@@ -506,6 +506,18 @@ describe('AI field serialization', () => {
     expect(res.body.fallbackIndex).toBeUndefined();
     expect(res.body.tpmTokens).toBeUndefined();
   });
+
+  it('includes fallbackIndex when it is 0', async () => {
+    const job = mockJob('ai0', { fallbackIndex: 0, getState: vi.fn().mockResolvedValue('completed') });
+    const q = mockQueue('q', {
+      getJob: vi.fn().mockResolvedValue(job),
+      getJobLogs: vi.fn().mockResolvedValue({ logs: [], count: 0 }),
+    });
+    const app = makeApp([q]);
+    const res = await request(app).get('/dash/api/queues/q/job/ai0');
+    expect(res.status).toBe(200);
+    expect(res.body.fallbackIndex).toBe(0);
+  });
 });
 
 // --- AI-native endpoints ---

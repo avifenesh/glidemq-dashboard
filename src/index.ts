@@ -57,7 +57,7 @@ function serializeJob(j: Job): Record<string, unknown> {
   if ((j as any).usage) result.usage = (j as any).usage;
   if ((j as any).signals?.length) result.signals = (j as any).signals;
   if ((j as any).budgetKey) result.budgetKey = (j as any).budgetKey;
-  if ((j as any).fallbackIndex) result.fallbackIndex = (j as any).fallbackIndex;
+  if ((j as any).fallbackIndex != null) result.fallbackIndex = (j as any).fallbackIndex;
   if ((j as any).tpmTokens != null) result.tpmTokens = (j as any).tpmTokens;
   return result;
 }
