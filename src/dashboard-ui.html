@@ -1142,13 +1142,23 @@
       table.appendChild(thead);
       var tbody = document.createElement('tbody');
       data.forEach(function(j) {
-        var jid = String(j.id);
+        var envelope = j.data && j.data.originalJobId != null ? j.data : null;
+        var jid = String((envelope && envelope.originalJobId) || j.id);
+        var failedReason = j.failedReason || (envelope && envelope.failedReason) || (j.data && j.data.failedReason) || '';
+        var jobName = j.name || (envelope && envelope.name) || '-';
         var tr = document.createElement('tr');
         tr.style.cursor = 'pointer';
-        tr.onclick = function() { inspectJob(jid); };
+        var origQueue = envelope && envelope.originalQueue;
+        tr.onclick = function() {
+          if (origQueue && origQueue !== selectedQueue && queues.some(function(item) { return (item.name || item) === origQueue; })) {
+            selectQueue(origQueue).then(function() { inspectJob(jid); });
+            return;
+          }
+          inspectJob(jid);
+        };
         var tdId = document.createElement('td'); tdId.className = 'cell-id'; tdId.textContent = jid;
-        var tdName = document.createElement('td'); tdName.className = 'cell-name'; tdName.textContent = j.name || '-';
-        var tdFail = document.createElement('td'); tdFail.style.cssText = 'color:var(--red);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'; tdFail.textContent = j.failedReason || '-';
+        var tdName = document.createElement('td'); tdName.className = 'cell-name'; tdName.textContent = jobName;
+        var tdFail = document.createElement('td'); tdFail.style.cssText = 'color:var(--red);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'; tdFail.textContent = failedReason || '-';
         var tdTime = document.createElement('td'); tdTime.className = 'cell-time'; tdTime.textContent = j.timestamp ? relTime(j.timestamp) : '-';
         tr.appendChild(tdId); tr.appendChild(tdName); tr.appendChild(tdFail); tr.appendChild(tdTime);
         tbody.appendChild(tr);
