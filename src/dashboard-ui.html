@@ -701,7 +701,9 @@
     if (!has) return;
     $('mTokens').textContent = Number(tokens).toLocaleString();
     var costNum = Number(cost);
-    $('mCost').textContent = costNum >= 0.01 ? '$' + costNum.toFixed(2) : '$' + costNum.toFixed(4);
+    var unit = (data && data.costUnit) ? String(data.costUnit) : 'usd';
+    var formatted = costNum >= 0.01 ? costNum.toFixed(2) : costNum.toFixed(4);
+    $('mCost').textContent = unit.toLowerCase() === 'usd' ? '$' + formatted : formatted + ' ' + unit;
     $('mUsageJobs').textContent = Number(jobs).toLocaleString();
     $('mModels').textContent = models.length ? models.join(', ') : '—';
   }
