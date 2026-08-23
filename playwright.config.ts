@@ -6,7 +6,7 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: ci,
-  retries: ci ? 2 : 0,
+  retries: ci ? 1 : 0,
   workers: ci ? 1 : undefined,
   reporter: ci ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
