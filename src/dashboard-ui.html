@@ -838,6 +838,7 @@
     $('queueView').style.display = 'flex';
     $('queueName').textContent = name;
     $('searchInput').value = '';
+    jobsAreSearch = false;
     updateStateTag();
     renderSidebar();
     updateFilterCounts();
@@ -1009,6 +1010,7 @@
     $('filterBar').querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
     tab.classList.add('active');
     $('searchInput').value = '';
+    jobsAreSearch = false;
     loadJobs();
   }
 
