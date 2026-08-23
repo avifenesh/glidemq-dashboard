@@ -671,10 +671,7 @@
   async function loadQueues() {
     try { var data = await api('/api/queues'); queues = Array.isArray(data) ? data : []; } catch (e) { /* keep existing */ }
     renderSidebar();
-    if (!selectedQueue) {
-      renderOverview();
-      loadUsageSummary();
-    }
+    if (!selectedQueue) renderOverview();
     if (selectedQueue) updateFilterCounts();
   }
 
@@ -687,6 +684,18 @@
     }
   }
 
+  function formatModelCounts(models) {
+    var entries = Object.keys(models).map(function(name) {
+      return { name: name, count: Number(models[name]) || 0 };
+    });
+    entries.sort(function(a, b) { return b.count - a.count; });
+    var top = entries.slice(0, 3).map(function(m) {
+      return m.name + ' (' + m.count.toLocaleString() + ')';
+    });
+    if (entries.length > 3) top.push('+' + (entries.length - 3));
+    return top.length ? top.join(', ') : '—';
+  }
+
   function renderUsageSummary(data) {
     var grid = $('usageGrid');
     var title = $('usageTitle');
@@ -694,18 +703,20 @@
     var tokens = data && (data.totalTokens || 0);
     var cost = data && (data.totalCost || 0);
     var jobs = data && (data.jobCount || 0);
-    var models = data && data.models ? Object.keys(data.models) : [];
+    var models = data && data.models ? data.models : {};
     var has = tokens > 0 || cost > 0 || jobs > 0;
     grid.style.display = has ? '' : 'none';
     title.style.display = has ? '' : 'none';
     if (!has) return;
     $('mTokens').textContent = Number(tokens).toLocaleString();
     var costNum = Number(cost);
-    var unit = (data && data.costUnit) ? String(data.costUnit) : 'usd';
     var formatted = costNum >= 0.01 ? costNum.toFixed(2) : costNum.toFixed(4);
-    $('mCost').textContent = unit.toLowerCase() === 'usd' ? '$' + formatted : formatted + ' ' + unit;
+    var unit = data && data.costUnit != null && String(data.costUnit) !== '' ? String(data.costUnit) : '';
+    if (unit.toLowerCase() === 'usd') $('mCost').textContent = '$' + formatted;
+    else if (unit) $('mCost').textContent = formatted + ' ' + unit;
+    else $('mCost').textContent = formatted;
     $('mUsageJobs').textContent = Number(jobs).toLocaleString();
-    $('mModels').textContent = models.length ? models.join(', ') : '—';
+    $('mModels').textContent = formatModelCounts(models);
   }
 
   function renderSidebar() {
@@ -850,19 +861,25 @@
 
   async function loadJobs() {
     if (!selectedQueue) return;
-    jobsAreSearch = false;
-    var start = jobPage * JOB_PAGE_SIZE;
+    var queueAtRequest = selectedQueue;
+    var filterAtRequest = currentFilter;
+    var pageAtRequest = jobPage;
+    var start = pageAtRequest * JOB_PAGE_SIZE;
     var end = start + JOB_PAGE_SIZE;
     var params = '?start=' + start + '&end=' + end;
-    if (currentFilter) params = '?state=' + currentFilter + '&start=' + start + '&end=' + end;
+    if (filterAtRequest) params = '?state=' + filterAtRequest + '&start=' + start + '&end=' + end;
     var loadFailed = false;
-    try { var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/jobs' + params); jobs = Array.isArray(data) ? data : []; }
-    catch (e) { jobs = []; loadFailed = true; toast('Failed to load jobs', 'error'); }
-    if (!loadFailed && jobPage > 0 && jobs.length === 0) { jobPage -= 1; return loadJobs(); }
+    var data;
+    try { data = await api('/api/queues/' + encodeURIComponent(queueAtRequest) + '/jobs' + params); }
+    catch (e) { loadFailed = true; }
+    if (selectedQueue !== queueAtRequest || currentFilter !== filterAtRequest || jobPage !== pageAtRequest || jobsAreSearch) return;
+    if (loadFailed) { jobs = []; toast('Failed to load jobs', 'error'); }
+    else { jobs = Array.isArray(data) ? data : []; }
+    if (!loadFailed && pageAtRequest > 0 && jobs.length === 0) { jobPage -= 1; return loadJobs(); }
     var overFetched = jobs.length > JOB_PAGE_SIZE;
     if (overFetched) jobs = jobs.slice(0, JOB_PAGE_SIZE);
-    var shown = jobPage * JOB_PAGE_SIZE + jobs.length;
-    jobHasMore = overFetched || shown < selectedQueueJobTotal(currentFilter);
+    var shown = pageAtRequest * JOB_PAGE_SIZE + jobs.length;
+    jobHasMore = overFetched || shown < selectedQueueJobTotal(filterAtRequest);
     renderJobs();
     updateJobPager();
   }
@@ -995,10 +1012,14 @@
   async function searchJobs() {
     var q = $('searchInput').value.trim();
     if (!q || !selectedQueue) return;
+    var queueAtRequest = selectedQueue;
+    var queryAtRequest = q;
+    var filterAtRequest = currentFilter;
     var params = '?name=' + encodeURIComponent(q);
-    if (currentFilter) params += '&state=' + currentFilter;
+    if (filterAtRequest) params += '&state=' + filterAtRequest;
     try {
-      var data = await api('/api/queues/' + encodeURIComponent(selectedQueue) + '/search' + params);
+      var data = await api('/api/queues/' + encodeURIComponent(queueAtRequest) + '/search' + params);
+      if (selectedQueue !== queueAtRequest || $('searchInput').value.trim() !== queryAtRequest || currentFilter !== filterAtRequest) return;
       jobs = Array.isArray(data) ? data : [];
       jobsAreSearch = true;
       jobPage = 0;
@@ -1265,7 +1286,8 @@
       var tbody = document.createElement('tbody');
       data.forEach(function(j) {
         var envelope = j.data && j.data.originalJobId != null ? j.data : null;
-        var jid = String((envelope && envelope.originalJobId) || j.id);
+        var originalJobId = envelope && envelope.originalJobId;
+        var jid = String(originalJobId != null ? originalJobId : j.id);
         var failedReason = j.failedReason || (envelope && envelope.failedReason) || (j.data && j.data.failedReason) || '';
         var jobName = j.name || (envelope && envelope.name) || '-';
         var tr = document.createElement('tr');
@@ -1845,8 +1867,10 @@
   };
 
   loadQueues();
+  loadUsageSummary();
   connectSSE();
-  setInterval(function() { loadQueues(); if (selectedQueue && currentPanel === 'jobs') loadJobs(); }, 3000);
+  setInterval(function() { loadQueues(); if (selectedQueue && currentPanel === 'jobs' && !jobsAreSearch) loadJobs(); }, 3000);
+  setInterval(function() { if (!selectedQueue) loadUsageSummary(); }, 15000);
 })();
 </script>
 </body>
