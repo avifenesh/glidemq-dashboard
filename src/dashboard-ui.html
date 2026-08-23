@@ -675,11 +675,16 @@
     if (selectedQueue) updateFilterCounts();
   }
 
+  var usageRequestVersion = 0;
+
   async function loadUsageSummary() {
+    var requestVersion = ++usageRequestVersion;
     try {
       var data = await api('/api/usage/summary');
+      if (requestVersion !== usageRequestVersion) return;
       renderUsageSummary(data);
     } catch (e) {
+      if (requestVersion !== usageRequestVersion) return;
       renderUsageSummary(null);
     }
   }
