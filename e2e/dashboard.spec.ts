@@ -40,18 +40,23 @@ test('filter and queue navigation leave search mode', async ({ page }) => {
   await page.getByText('payments', { exact: true }).first().click();
   await page.locator('#searchInput').fill('charge');
   await page.getByRole('button', { name: 'Search', exact: true }).click();
-  await expect(page.getByText('j-wait')).toBeVisible();
-
-  await page.locator('.filter-tab', { hasText: 'Failed' }).click();
   await expect(page.getByText('j-fail')).toBeVisible();
-  await expect(page.getByText('j-wait')).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Retry', exact: true }).evaluate((button) => {
+    (button as HTMLButtonElement).click();
+  });
+  await expect(page.locator('#searchInput')).toHaveValue('');
+
+  await page.locator('.filter-tab', { hasText: 'Waiting' }).click();
+  await expect(page.getByText('j-wait')).toBeVisible();
+  await expect(page.getByText('j-fail')).toHaveCount(0);
 
   await page.locator('#searchInput').fill('charge');
   await page.getByRole('button', { name: 'Search', exact: true }).click();
-  await expect(page.getByText('j-wait')).toBeVisible();
+  await expect(page.getByText('j-fail')).toBeVisible();
   await page.getByText('email', { exact: true }).first().click();
   await expect(page.locator('#queueName')).toHaveText('email');
-  await expect(page.getByText('j-wait')).toHaveCount(0);
+  await expect(page.getByText('j-fail')).toHaveCount(0);
 });
 
 test('pause updates the queue state tag and toast', async ({ page }) => {

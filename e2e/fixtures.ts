@@ -35,7 +35,7 @@ function createSeededApp() {
 
   const payments = mockQueue(resolved, 'payments', {
     getJobs: (state: unknown) => Promise.resolve(jobsByState[String(state)] ?? []),
-    searchJobs: resolved([waiting]),
+    searchJobs: resolved([failed]),
     getJob: (id: unknown) => Promise.resolve(jobsById.get(String(id)) ?? null),
     getJobLogs: resolved({ logs: ['charged'], count: 1 }),
     getWorkers: resolved([
