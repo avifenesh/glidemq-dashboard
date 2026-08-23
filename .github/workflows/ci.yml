@@ -70,7 +70,7 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+        run: npm exec -- playwright install --with-deps chromium
 
       - name: Run Playwright tests
         run: npm run test:e2e
