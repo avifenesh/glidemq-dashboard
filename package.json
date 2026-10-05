@@ -1,6 +1,6 @@
 {
   "name": "@glidemq/dashboard",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Web dashboard for glide-mq - queue monitoring, management, and AI observability",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -33,7 +33,7 @@
     "@types/node": "^22",
     "@types/supertest": "^6",
     "express": "^5",
-    "glide-mq": "^0.15.2",
+    "glide-mq": "^0.17.0",
     "supertest": "^7",
     "typescript": "^5",
     "vitest": "^4"
