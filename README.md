@@ -19,6 +19,8 @@ npm install @glidemq/dashboard glide-mq express
 
 Requires **glide-mq >= 0.15.2** and **Express 4 or 5**.
 
+Compatibility is tested with **glide-mq 0.20.0**. The minimum supported peer range and dashboard HTTP behavior remain unchanged.
+
 ## Quick start
 
 ```typescript
