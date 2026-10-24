@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.3
+
+- Validate against glide-mq 0.20.0 with real SDK scheduler inventory coverage.
+- Preserve the supported glide-mq peer range and existing HTTP/UI behavior.
+- Patch the development body-parser entry for its compressed-body advisory.
+
 ## 0.4.2
 
 - Validate against glide-mq 0.17.0 and replace the floating development dependency with an explicit compatible range.
