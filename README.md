@@ -42,7 +42,7 @@ app.listen(3000);
 
 Job detail views include AI fields when present: `usage` (record-based token/cost breakdown), `signals`, `budgetKey`, `fallbackIndex`, and `tpmTokens`.
 
-Three dedicated endpoints expose AI orchestration state:
+Four dedicated endpoints expose AI orchestration state:
 
 - **`GET /api/queues/:name/flows/:id/usage`** - Aggregated token/cost usage across all jobs in a flow. Returns the combined usage record.
 - **`GET /api/queues/:name/flows/:id/budget`** - Budget state for a flow - current spend, per-category caps, remaining budget. Returns 404 if no budget is set.
